@@ -1,0 +1,588 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FFFA94962B8D468700CE14F8 /* LoRaxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */; };
+		FFFA94982B8D468700CE14F8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94972B8D468700CE14F8 /* ContentView.swift */; };
+		FFFA949A2B8D468B00CE14F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFFA94992B8D468B00CE14F8 /* Assets.xcassets */; };
+		FFFA949D2B8D468B00CE14F8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFFA949C2B8D468B00CE14F8 /* Preview Assets.xcassets */; };
+		FFFA94A72B8D468C00CE14F8 /* LoRaxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94A62B8D468C00CE14F8 /* LoRaxTests.swift */; };
+		FFFA94B12B8D468C00CE14F8 /* LoRaxUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94B02B8D468C00CE14F8 /* LoRaxUITests.swift */; };
+		FFFA94B32B8D468C00CE14F8 /* LoRaxUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94B22B8D468C00CE14F8 /* LoRaxUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FFFA94A32B8D468C00CE14F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFFA948A2B8D468600CE14F8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FFFA94912B8D468600CE14F8;
+			remoteInfo = LoRax;
+		};
+		FFFA94AD2B8D468C00CE14F8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFFA948A2B8D468600CE14F8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FFFA94912B8D468600CE14F8;
+			remoteInfo = LoRax;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		FFFA94922B8D468600CE14F8 /* LoRax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoRax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoRaxApp.swift; sourceTree = "<group>"; };
+		FFFA94972B8D468700CE14F8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FFFA94992B8D468B00CE14F8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FFFA949C2B8D468B00CE14F8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		FFFA94A22B8D468C00CE14F8 /* LoRaxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoRaxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFFA94A62B8D468C00CE14F8 /* LoRaxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoRaxTests.swift; sourceTree = "<group>"; };
+		FFFA94AC2B8D468C00CE14F8 /* LoRaxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoRaxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFFA94B02B8D468C00CE14F8 /* LoRaxUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoRaxUITests.swift; sourceTree = "<group>"; };
+		FFFA94B22B8D468C00CE14F8 /* LoRaxUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoRaxUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FFFA948F2B8D468600CE14F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFA949F2B8D468C00CE14F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFA94A92B8D468C00CE14F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FFFA94892B8D468600CE14F8 = {
+			isa = PBXGroup;
+			children = (
+				FFFA94942B8D468600CE14F8 /* LoRax */,
+				FFFA94A52B8D468C00CE14F8 /* LoRaxTests */,
+				FFFA94AF2B8D468C00CE14F8 /* LoRaxUITests */,
+				FFFA94932B8D468600CE14F8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FFFA94932B8D468600CE14F8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FFFA94922B8D468600CE14F8 /* LoRax.app */,
+				FFFA94A22B8D468C00CE14F8 /* LoRaxTests.xctest */,
+				FFFA94AC2B8D468C00CE14F8 /* LoRaxUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FFFA94942B8D468600CE14F8 /* LoRax */ = {
+			isa = PBXGroup;
+			children = (
+				FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */,
+				FFFA94972B8D468700CE14F8 /* ContentView.swift */,
+				FFFA94992B8D468B00CE14F8 /* Assets.xcassets */,
+				FFFA949B2B8D468B00CE14F8 /* Preview Content */,
+			);
+			path = LoRax;
+			sourceTree = "<group>";
+		};
+		FFFA949B2B8D468B00CE14F8 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				FFFA949C2B8D468B00CE14F8 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		FFFA94A52B8D468C00CE14F8 /* LoRaxTests */ = {
+			isa = PBXGroup;
+			children = (
+				FFFA94A62B8D468C00CE14F8 /* LoRaxTests.swift */,
+			);
+			path = LoRaxTests;
+			sourceTree = "<group>";
+		};
+		FFFA94AF2B8D468C00CE14F8 /* LoRaxUITests */ = {
+			isa = PBXGroup;
+			children = (
+				FFFA94B02B8D468C00CE14F8 /* LoRaxUITests.swift */,
+				FFFA94B22B8D468C00CE14F8 /* LoRaxUITestsLaunchTests.swift */,
+			);
+			path = LoRaxUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FFFA94912B8D468600CE14F8 /* LoRax */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFFA94B62B8D468C00CE14F8 /* Build configuration list for PBXNativeTarget "LoRax" */;
+			buildPhases = (
+				FFFA948E2B8D468600CE14F8 /* Sources */,
+				FFFA948F2B8D468600CE14F8 /* Frameworks */,
+				FFFA94902B8D468600CE14F8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LoRax;
+			productName = LoRax;
+			productReference = FFFA94922B8D468600CE14F8 /* LoRax.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FFFA94A12B8D468C00CE14F8 /* LoRaxTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFFA94B92B8D468C00CE14F8 /* Build configuration list for PBXNativeTarget "LoRaxTests" */;
+			buildPhases = (
+				FFFA949E2B8D468C00CE14F8 /* Sources */,
+				FFFA949F2B8D468C00CE14F8 /* Frameworks */,
+				FFFA94A02B8D468C00CE14F8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FFFA94A42B8D468C00CE14F8 /* PBXTargetDependency */,
+			);
+			name = LoRaxTests;
+			productName = LoRaxTests;
+			productReference = FFFA94A22B8D468C00CE14F8 /* LoRaxTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FFFA94AB2B8D468C00CE14F8 /* LoRaxUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFFA94BC2B8D468C00CE14F8 /* Build configuration list for PBXNativeTarget "LoRaxUITests" */;
+			buildPhases = (
+				FFFA94A82B8D468C00CE14F8 /* Sources */,
+				FFFA94A92B8D468C00CE14F8 /* Frameworks */,
+				FFFA94AA2B8D468C00CE14F8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FFFA94AE2B8D468C00CE14F8 /* PBXTargetDependency */,
+			);
+			name = LoRaxUITests;
+			productName = LoRaxUITests;
+			productReference = FFFA94AC2B8D468C00CE14F8 /* LoRaxUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FFFA948A2B8D468600CE14F8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1340;
+				LastUpgradeCheck = 1340;
+				TargetAttributes = {
+					FFFA94912B8D468600CE14F8 = {
+						CreatedOnToolsVersion = 13.4.1;
+					};
+					FFFA94A12B8D468C00CE14F8 = {
+						CreatedOnToolsVersion = 13.4.1;
+						TestTargetID = FFFA94912B8D468600CE14F8;
+					};
+					FFFA94AB2B8D468C00CE14F8 = {
+						CreatedOnToolsVersion = 13.4.1;
+						TestTargetID = FFFA94912B8D468600CE14F8;
+					};
+				};
+			};
+			buildConfigurationList = FFFA948D2B8D468600CE14F8 /* Build configuration list for PBXProject "LoRax" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FFFA94892B8D468600CE14F8;
+			productRefGroup = FFFA94932B8D468600CE14F8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FFFA94912B8D468600CE14F8 /* LoRax */,
+				FFFA94A12B8D468C00CE14F8 /* LoRaxTests */,
+				FFFA94AB2B8D468C00CE14F8 /* LoRaxUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FFFA94902B8D468600CE14F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFA949D2B8D468B00CE14F8 /* Preview Assets.xcassets in Resources */,
+				FFFA949A2B8D468B00CE14F8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFA94A02B8D468C00CE14F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFA94AA2B8D468C00CE14F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FFFA948E2B8D468600CE14F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFA94982B8D468700CE14F8 /* ContentView.swift in Sources */,
+				FFFA94962B8D468700CE14F8 /* LoRaxApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFA949E2B8D468C00CE14F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFA94A72B8D468C00CE14F8 /* LoRaxTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFA94A82B8D468C00CE14F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFA94B12B8D468C00CE14F8 /* LoRaxUITests.swift in Sources */,
+				FFFA94B32B8D468C00CE14F8 /* LoRaxUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FFFA94A42B8D468C00CE14F8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FFFA94912B8D468600CE14F8 /* LoRax */;
+			targetProxy = FFFA94A32B8D468C00CE14F8 /* PBXContainerItemProxy */;
+		};
+		FFFA94AE2B8D468C00CE14F8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FFFA94912B8D468600CE14F8 /* LoRax */;
+			targetProxy = FFFA94AD2B8D468C00CE14F8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FFFA94B42B8D468C00CE14F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FFFA94B52B8D468C00CE14F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FFFA94B72B8D468C00CE14F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LoRax/Preview Content\"";
+				DEVELOPMENT_TEAM = 34NDP3BGK5;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nmsu.LoRax;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FFFA94B82B8D468C00CE14F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LoRax/Preview Content\"";
+				DEVELOPMENT_TEAM = 34NDP3BGK5;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nmsu.LoRax;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FFFA94BA2B8D468C00CE14F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 34NDP3BGK5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nmsu.LoRaxTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoRax.app/LoRax";
+			};
+			name = Debug;
+		};
+		FFFA94BB2B8D468C00CE14F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 34NDP3BGK5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nmsu.LoRaxTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoRax.app/LoRax";
+			};
+			name = Release;
+		};
+		FFFA94BD2B8D468C00CE14F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 34NDP3BGK5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nmsu.LoRaxUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LoRax;
+			};
+			name = Debug;
+		};
+		FFFA94BE2B8D468C00CE14F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 34NDP3BGK5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nmsu.LoRaxUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LoRax;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FFFA948D2B8D468600CE14F8 /* Build configuration list for PBXProject "LoRax" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFFA94B42B8D468C00CE14F8 /* Debug */,
+				FFFA94B52B8D468C00CE14F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFFA94B62B8D468C00CE14F8 /* Build configuration list for PBXNativeTarget "LoRax" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFFA94B72B8D468C00CE14F8 /* Debug */,
+				FFFA94B82B8D468C00CE14F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFFA94B92B8D468C00CE14F8 /* Build configuration list for PBXNativeTarget "LoRaxTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFFA94BA2B8D468C00CE14F8 /* Debug */,
+				FFFA94BB2B8D468C00CE14F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFFA94BC2B8D468C00CE14F8 /* Build configuration list for PBXNativeTarget "LoRaxUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFFA94BD2B8D468C00CE14F8 /* Debug */,
+				FFFA94BE2B8D468C00CE14F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FFFA948A2B8D468600CE14F8 /* Project object */;
+}
