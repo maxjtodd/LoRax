@@ -6,7 +6,7 @@
 
 #define RF_FREQUENCY                                915000000 // Hz
 
-#define TX_OUTPUT_POWER                             5        // dBm
+#define TX_OUTPUT_POWER                             14        // dBm
 
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz,
                                                               //  1: 250 kHz,
@@ -27,79 +27,67 @@
 #define BUFFER_SIZE                                 30 // Define the payload size here
 
 char txpacket[BUFFER_SIZE];
-char serial[100];
 char rxpacket[BUFFER_SIZE];
 
-double txNumber;
-
-bool lora_idle=true;
-
 static RadioEvents_t RadioEvents;
-void OnTxDone( void );
-void OnTxTimeout( void );
+
+int16_t txNumber;
+
+int16_t rssi,rxSize;
+
+bool lora_idle = true;
 
 void setup() {
     Serial.begin(115200);
-    // Initialising the UI will init the display too.
+
     display.init();
-
     display.setFont(ArialMT_Plain_10);
-    Mcu.begin();
-  
-    txNumber=0;
 
-    RadioEvents.TxDone = OnTxDone;
-    RadioEvents.TxTimeout = OnTxTimeout;
+    Mcu.begin();
     
+    txNumber=0;
+    rssi=0;
+  
+    RadioEvents.RxDone = OnRxDone;
     Radio.Init( &RadioEvents );
     Radio.SetChannel( RF_FREQUENCY );
-    Radio.SetTxConfig( MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
-                                   LORA_SPREADING_FACTOR, LORA_CODINGRATE,
-                                   LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
-                                   true, 0, 0, LORA_IQ_INVERSION_ON, 3000 ); 
-   }
+    Radio.SetRxConfig( MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
+                               LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
+                               LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
+                               0, true, 0, 0, LORA_IQ_INVERSION_ON, true );
+}
+
 
 
 void loop()
-{
-  if(lora_idle == true)
+{ 
+  delay(1000);
+  display.clear();
+  
+  if(lora_idle)
   {
-    delay(1000);
-    display.clear();
-    
-    txNumber += 0.01;
-    sprintf(txpacket,"Hello world number %0.2f",txNumber);  //start a package
-    sprintf(serial, "\r\nsending packet, length %d\r\n", strlen(txpacket));
-    Serial.printf(serial);
-    display.setFont(ArialMT_Plain_10);
-    display.drawString(0, 10, txpacket);
-    display.setFont(ArialMT_Plain_10);
-    display.drawStringMaxWidth(0, 10, 128,serial);
-    // write the buffer to the display
-    display.display();
-    Radio.Send( (uint8_t *)txpacket, strlen(txpacket) ); //send the package out 
     lora_idle = false;
+    Serial.println("into RX mode");
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(0,10, "Waiting for packets...");
+    display.display();
+    Radio.Rx(0);
   }
   Radio.IrqProcess( );
 }
 
-void OnTxDone( void )
-{
-  Serial.println("TX done......");
-  display.setFont(ArialMT_Plain_10);
-  display.drawString(0, 50, "TX done......");
-  // write the buffer to the display
-  display.display();
-  lora_idle = true;
-}
-
-void OnTxTimeout( void )
-{
+void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
+{   
+    char result[100];
+    rssi=rssi;
+    rxSize=size;
+    memcpy(rxpacket, payload, size );
+    rxpacket[size]='\0';
     Radio.Sleep( );
-    Serial.println("TX Timeout......");
+    sprintf(result,"\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",rxpacket,rssi,rxSize);
+    Serial.printf(result);
     display.setFont(ArialMT_Plain_10);
-    display.drawString(0, 50, "TX Timeout......");
-    // write the buffer to the display
+    display.drawStringMaxWidth(0,20,128,result);
     display.display();
     lora_idle = true;
 }
