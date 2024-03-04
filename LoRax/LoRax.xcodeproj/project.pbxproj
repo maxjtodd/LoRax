@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FFA0346A2B96858A0009CC76 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA034692B96858A0009CC76 /* Message.swift */; };
+		FFA0346C2B9685B40009CC76 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA0346B2B9685B40009CC76 /* MessageView.swift */; };
 		FFFA94962B8D468700CE14F8 /* LoRaxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */; };
 		FFFA94982B8D468700CE14F8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94972B8D468700CE14F8 /* ContentView.swift */; };
 		FFFA949A2B8D468B00CE14F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFFA94992B8D468B00CE14F8 /* Assets.xcassets */; };
@@ -34,6 +36,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FFA034692B96858A0009CC76 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		FFA0346B2B9685B40009CC76 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		FFFA94922B8D468600CE14F8 /* LoRax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoRax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoRaxApp.swift; sourceTree = "<group>"; };
 		FFFA94972B8D468700CE14F8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +100,8 @@
 			children = (
 				FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */,
 				FFFA94972B8D468700CE14F8 /* ContentView.swift */,
+				FFA034692B96858A0009CC76 /* Message.swift */,
+				FFA0346B2B9685B40009CC76 /* MessageView.swift */,
 				FFFA94992B8D468B00CE14F8 /* Assets.xcassets */,
 				FFFA949B2B8D468B00CE14F8 /* Preview Content */,
 			);
@@ -257,6 +263,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFA0346C2B9685B40009CC76 /* MessageView.swift in Sources */,
+				FFA0346A2B96858A0009CC76 /* Message.swift in Sources */,
 				FFFA94982B8D468700CE14F8 /* ContentView.swift in Sources */,
 				FFFA94962B8D468700CE14F8 /* LoRaxApp.swift in Sources */,
 			);
