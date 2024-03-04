@@ -1,1 +1,6 @@
 *.DS_Store
+
+# XCode data that shouldn't be committed
+xcuserdata/
+*~.nib
+DerivedData/
