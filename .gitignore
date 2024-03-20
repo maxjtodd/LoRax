@@ -1,1 +1,13 @@
 .DS_Store
+*.DS_Store
+
+# XCode data that shouldn't be committed
+xcuserdata/
+*~.nib
+DerivedData/
+
+/.vscode
+/LoRax
+
+/hardware/libraries
+/hardware/esp32
