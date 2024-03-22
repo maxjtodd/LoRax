@@ -12,24 +12,29 @@ import CoreBluetooth
 @available(iOS 16.0, *)
 struct ContentView: View {
     
+    @State private var tabSelection = 1
+    
     var body: some View {
             VStack {
-                TabView {
+                TabView(selection:$tabSelection) {
                     ChatView()
                         .tabItem {
                             Image(systemName: "message.fill")
                             Text("Chat")
                         }
+                        .tag(0)
                     ContactView()
                         .tabItem {
                             Image(systemName: "person.fill")
                             Text("Contacts")
                         }
+                        .tag(1)
                     AdvancedView()
                         .tabItem {
                             Image(systemName: "gearshape.fill")
                             Text("Advanced")
                         }
+                        .tag(2)
                 }
             }
         }

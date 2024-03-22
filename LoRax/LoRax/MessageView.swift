@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 
+@available(iOS 16.0, *)
 struct MessageView: View {
     
     // context to create, edit, and modify core data objects
@@ -75,15 +76,20 @@ struct MessageView: View {
             .navigationTitle("\(currentMac)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                
+                // Backwards Navigation
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Spacer()
-                    Button("", systemImage: "arrowshape.backward") {
-                        print("Pressed")
+
+                    NavigationLink(destination: ContentView()) {
+                        Label("Back", systemImage: "arrowshape.backward")
                     }
+                    
                     Spacer()
                     
                 }
                 
+                // TODO: delete messages
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Spacer()
                     Button("", systemImage: "square.and.pencil") {
@@ -243,6 +249,7 @@ private let timestampFormatter: DateFormatter = {
 }()
 
 
+@available(iOS 16.0, *)
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
         MessageView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
