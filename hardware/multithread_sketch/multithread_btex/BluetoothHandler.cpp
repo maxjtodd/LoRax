@@ -1,7 +1,8 @@
 #include "BluetoothHandler.h"
 #include <BLEDevice.h>
 #include <BLEUtils.h>
-#include <Heltec.h> // Assuming this is where Heltec related code resides
+//#include <Heltec.h> // Assuming this is where Heltec related code resides
+#include "heltec.h"
 
 #define SERVICE_UUID        "12345678-1234-1234-1234-123456789abc"
 #define CHARACTERISTIC_UUID "abcdefab-cdef-1234-5678-123456789abc"
