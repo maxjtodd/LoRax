@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FFA0346A2B96858A0009CC76 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA034692B96858A0009CC76 /* Message.swift */; };
 		FFA0346C2B9685B40009CC76 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA0346B2B9685B40009CC76 /* MessageView.swift */; };
+		FFC941122BAE1D2F0001073F /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC941112BAE1D2F0001073F /* ContactView.swift */; };
+		FFD6C1242BAE174300C4ED54 /* LoRax.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FFD6C1222BAE174300C4ED54 /* LoRax.xcdatamodeld */; };
+		FFD6C1262BAE193000C4ED54 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD6C1252BAE193000C4ED54 /* Persistence.swift */; };
 		FFFA94962B8D468700CE14F8 /* LoRaxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */; };
 		FFFA94982B8D468700CE14F8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFA94972B8D468700CE14F8 /* ContentView.swift */; };
 		FFFA949A2B8D468B00CE14F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFFA94992B8D468B00CE14F8 /* Assets.xcassets */; };
@@ -36,8 +38,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FFA034692B96858A0009CC76 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		FFA0346B2B9685B40009CC76 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
+		FFC941112BAE1D2F0001073F /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
+		FFD6C1232BAE174300C4ED54 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		FFD6C1252BAE193000C4ED54 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		FFFA94922B8D468600CE14F8 /* LoRax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoRax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoRaxApp.swift; sourceTree = "<group>"; };
 		FFFA94972B8D468700CE14F8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,9 +103,11 @@
 			isa = PBXGroup;
 			children = (
 				FFFA94952B8D468700CE14F8 /* LoRaxApp.swift */,
+				FFD6C1252BAE193000C4ED54 /* Persistence.swift */,
 				FFFA94972B8D468700CE14F8 /* ContentView.swift */,
-				FFA034692B96858A0009CC76 /* Message.swift */,
+				FFC941112BAE1D2F0001073F /* ContactView.swift */,
 				FFA0346B2B9685B40009CC76 /* MessageView.swift */,
+				FFD6C1222BAE174300C4ED54 /* LoRax.xcdatamodeld */,
 				FFFA94992B8D468B00CE14F8 /* Assets.xcassets */,
 				FFFA949B2B8D468B00CE14F8 /* Preview Content */,
 			);
@@ -264,7 +270,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFA0346C2B9685B40009CC76 /* MessageView.swift in Sources */,
-				FFA0346A2B96858A0009CC76 /* Message.swift in Sources */,
+				FFC941122BAE1D2F0001073F /* ContactView.swift in Sources */,
+				FFD6C1242BAE174300C4ED54 /* LoRax.xcdatamodeld in Sources */,
+				FFD6C1262BAE193000C4ED54 /* Persistence.swift in Sources */,
 				FFFA94982B8D468700CE14F8 /* ContentView.swift in Sources */,
 				FFFA94962B8D468700CE14F8 /* LoRaxApp.swift in Sources */,
 			);
@@ -591,6 +599,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FFD6C1222BAE174300C4ED54 /* LoRax.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FFD6C1232BAE174300C4ED54 /* Model.xcdatamodel */,
+			);
+			currentVersion = FFD6C1232BAE174300C4ED54 /* Model.xcdatamodel */;
+			path = LoRax.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = FFFA948A2B8D468600CE14F8 /* Project object */;
 }

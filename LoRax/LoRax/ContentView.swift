@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreBluetooth
 
+
 @available(iOS 16.0, *)
 struct ContentView: View {
     
@@ -19,7 +20,7 @@ struct ContentView: View {
                             Image(systemName: "message.fill")
                             Text("Chat")
                         }
-                    ContactsView()
+                    ContactView()
                         .tabItem {
                             Image(systemName: "person.fill")
                             Text("Contacts")
@@ -34,46 +35,17 @@ struct ContentView: View {
         }
     }
 
-@available(iOS 16.0, *)
-struct ContactsView: View {
-    var body: some View {
-        Text ("This is the contacts page.")
-    }
-}
 
-@available(iOS 16.0, *)
+
+
 struct ChatView: View {
-    @State private var chatMessages: [String] = [
-            "Hey, everyone!",
-            "This is the LoRax app",
-            "Hey, everyone!",
-            "This is the LoRax app","Hey, everyone!",
-            "This is the LoRax app","Hey, everyone!",
-            "This is the LoRax app","Hey, everyone!",
-            "This is the LoRax app","Hey, everyone!",
-            "This is the LoRax app","Hey, everyone!",
-            "This is the LoRax app","Hey, everyone!",
-            "This is the LoRax app",
-        ]
-        
+    
     var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(chatMessages, id: \.self) { message in
-                    Text(message)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .padding()
-        }
+        Text("Placeholder for available devices")
     }
 }
 
-@available(iOS 16.0, *)
+
 struct AdvancedView: View {
     @State private var showBluetoothDevices = false
     var body: some View {
@@ -97,12 +69,6 @@ struct AdvancedView: View {
     }
 }
 
-@available(iOS 16.0, *)
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
 
 struct BluetoothDevicesView: View {
     @StateObject var bluetoothManager = BluetoothManager()
@@ -143,5 +109,13 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
                 self.devices.append(peripheral)
             }
         }
+    }
+}
+
+
+@available(iOS 16.0, *)
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
