@@ -14,14 +14,15 @@ struct ContactView: View {
     // context to create, edit, and modify core data objects
     @Environment(\.managedObjectContext) private var viewContext
     
-    
+    // get a list of all contacts
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \Contact.mac, ascending: true)
         ],
         animation: .default)
-    private var items: FetchedResults<Contact>
+    private var contacts: FetchedResults<Contact>
     
+    // stores the selected components in edit mode
     @State private var multiSelection = Set<UUID>()
     
     // Properties for adding a new contact
@@ -38,7 +39,7 @@ struct ContactView: View {
                 
                 // Display the contacts if not adding contact
                 
-                List(items, selection: $multiSelection) {
+                List(contacts, selection: $multiSelection) {
                     ContactListSlot(contact: $0)
                 }
                 .navigationTitle("Contacts")
@@ -60,6 +61,8 @@ struct ContactView: View {
                         
                     }
                 }
+                
+                //TODO: List all message history of non-contacts
                 
             }.navigationBarHidden(true)
             
@@ -84,11 +87,12 @@ struct ContactView: View {
                     
                     TextField(
                         "MAC",
-                        text: $lName
+                        text: $mac
                     )
                         
                     Button("Add") {
-                        print("Pressed")
+                        addContact(fName: fName, lName: lName, mac: mac)
+                        addingContact = false
                     }
                     
                     
@@ -110,7 +114,38 @@ struct ContactView: View {
             .navigationBarHidden(true)
         }
     }
+    
+    
+    
+    /// Add a contact permanently into core data
+    /// - Parameters:
+    ///   - fName: first name of the contact to add
+    ///   - lName: last name of the contact to add
+    ///   - mac: mac address of the contact to add
+    private func addContact(fName: String, lName: String, mac: String) {
         
+        withAnimation{
+            
+            // Create the new contact
+            let newContact = Contact(context: viewContext)
+            newContact.fName = fName
+            newContact.lName = lName
+            newContact.mac = mac
+            
+            // Save the contact
+            do {
+                try viewContext.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+            
+        }
+        
+    }
+    
 }
 
 

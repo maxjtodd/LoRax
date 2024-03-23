@@ -14,17 +14,29 @@ struct MessageView: View {
     // context to create, edit, and modify core data objects
     @Environment(\.managedObjectContext) private var viewContext
     
+    
     // Current mac address we chatting / viewing
     var currentMac:String = "1:1:1:1"
 
-    // Get the latest messages first
+    
+    // Get all messages sorted by ascending date
     // TODO: only for the mac address used
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \Message.date, ascending: true)
         ],
         animation: .default)
-    private var items: FetchedResults<Message>
+    private var messages: FetchedResults<Message>
+    
+    
+    // get a list of all contacts
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Contact.mac, ascending: true)
+        ],
+        animation: .default)
+    private var contacts: FetchedResults<Contact>
+    
     
     // State variable: what is stored in the Message... box
     @State private var messageBoxContent:String = ""
@@ -37,7 +49,7 @@ struct MessageView: View {
                 // Display the messages
                 ScrollView {
 
-                    ForEach(Array(zip(items.indices, items)), id: \.0) { i, m in
+                    ForEach(Array(zip(messages.indices, messages)), id: \.0) { i, m in
                         if m.mac == currentMac {
                             if m.recieved {
                                 OneMessageRecieved(message: m)
@@ -73,7 +85,7 @@ struct MessageView: View {
                 
             }
             // Navigation bar
-            .navigationTitle("\(currentMac)")
+            .navigationTitle(getTitle(mac: currentMac, myContacts: contacts))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 
@@ -164,7 +176,7 @@ struct MessageView: View {
     private func deleteMessage(index: Int) {
         withAnimation {
 //            offsets.map { items[$0] }.forEach(viewContext.delete)
-            viewContext.delete(items[index])
+            viewContext.delete(messages[index])
 
             do {
                 try viewContext.save()
@@ -176,9 +188,24 @@ struct MessageView: View {
             }
         }
     }
+    
+    
+    
+    private func getTitle(mac: String, myContacts: FetchedResults<Contact>) -> String {
+        
+        for c in myContacts {
+            if mac == c.mac {
+                return "\(c.fName!) \(c.lName!)"
+            }
+        }
+        
+        return mac
+    }
+    
+    
 }
 
-
+    
 
 //
 struct OneMessageSentView: View {
