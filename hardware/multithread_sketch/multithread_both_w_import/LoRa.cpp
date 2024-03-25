@@ -64,46 +64,46 @@ void SendReceivecode(void* vpParameters) {
                              0, true, 0, 0, LORA_IQ_INVERSION_ON, true );
   state=STATE_TX;
 
-  switch (state)
-  {
-
-    case STATE_TX:
-      // display.clear();     
-      txNumber++;
-      sprintf(txpacket,"Hello world number %0.2f",txNumber);  //start a package
-      sprintf(serial, "\r\nsending packet, length %d\r\n", strlen(txpacket));
-      Serial.printf(serial);
-      // display.setFont(ArialMT_Plain_10);
-      // display.drawString(0, 10, txpacket);
-      // display.setFont(ArialMT_Plain_10);
-      // display.drawStringMaxWidth(0, 10, 128,serial);
-      // // write the buffer to the display
-      // display.display();
-      Radio.Send( (uint8_t *)txpacket, strlen(txpacket) ); //send the package out 
-      Radio.IrqProcess( );
-      break;
-    
-    case STATE_RX:
-      // display.clear();
-      lora_idle = false;
-      Serial.println("into RX mode");
-      // display.setFont(ArialMT_Plain_10);
-      // display.drawString(0,10, "Waiting for packets...");
-      // display.display();
-      Radio.Rx(0);
-      Radio.IrqProcess( );
-      delay(10000);
-      state = STATE_TX;
-      break;
-    
-    default:
-      break;
-    
-  }
-
   for (;;) {
     Serial.println("  Core 1 processing - send/receive");
-    delay(1000);
+    delay(5000);
+
+    switch (state)
+    {
+
+      case STATE_TX:
+        // display.clear();     
+        txNumber++;
+        sprintf(txpacket,"Hello world number %0.2f",txNumber);  //start a package
+        sprintf(serial, "\r\nsending packet, length %d\r\n", strlen(txpacket));
+        Serial.printf(serial);
+        // display.setFont(ArialMT_Plain_10);
+        // display.drawString(0, 10, txpacket);
+        // display.setFont(ArialMT_Plain_10);
+        // display.drawStringMaxWidth(0, 10, 128,serial);
+        // // write the buffer to the display
+        // display.display();
+        Radio.Send( (uint8_t *)txpacket, strlen(txpacket) ); //send the package out 
+        Radio.IrqProcess( );
+        break;
+      
+      case STATE_RX:
+        // display.clear();
+        lora_idle = false;
+        Serial.println("into RX mode");
+        // display.setFont(ArialMT_Plain_10);
+        // display.drawString(0,10, "Waiting for packets...");
+        // display.display();
+        Radio.Rx(0);
+        Radio.IrqProcess( );
+        delay(10000);
+        state = STATE_TX;
+        break;
+      
+      default:
+        break;
+      
+    }
 
   }
 
