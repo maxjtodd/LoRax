@@ -6,8 +6,6 @@
 #include "Arduino.h"          //| Included via loranwan
 
 #include "BluetoothHandler.h"
-//#include "C:\Users\brock\OneDrive\Desktop\CS448\LoRax_repo\hardware\multithread_sketch\multithread_btex\BluetoothHandler.cpp"
-
 #include "LoRa.h"
 
 
@@ -29,7 +27,7 @@ void loop() {
   // nothing to do here, everything happens in the Task1Code and Task2Code functions
   Serial.print("main loop on core ");
   Serial.println(xPortGetCoreID());
-  delay(3000);
+  delay(5500);
 }
 
 

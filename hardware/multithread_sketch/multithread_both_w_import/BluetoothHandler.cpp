@@ -25,7 +25,7 @@ void MyServerCallbacks::onConnect(BLEServer* pServer, esp_ble_gatts_cb_param_t *
     Serial.print("Connected to: ");
     Serial.printf(name.c_str());
     Serial.println();
-    
+
     // Heltec.display->drawString(0, 0, "Connected to:");
     // Heltec.display->drawString(0, 10, name.c_str());
     // Heltec.display->display();
@@ -69,6 +69,6 @@ void Bluetoothcode(void* pvParameters) {
 
     for (;;) { // infinite loop
         Serial.println("  Core 0 processing - Bluetooth");
-        delay(1000);
+        delay(5000);
     }
 }
