@@ -27,7 +27,7 @@ struct PersistenceController {
             else {
                 newMessage.recieved = false
             }
-            
+            newMessage.id = UUID()
             
 
         }

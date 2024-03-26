@@ -8,6 +8,7 @@
     <entity name="Message" representedClassName="Message" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="mac" optional="YES" attributeType="String"/>
         <attribute name="recieved" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
     </entity>
