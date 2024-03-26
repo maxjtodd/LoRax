@@ -58,13 +58,15 @@ struct MessageView: View {
                         ForEach(self.messages) { m in
                             HStack {
                                 if (editMode) {
-                                    Spacer()
-                                    Button("", systemImage: "minus.circle") {
-                                        deleteMessage(message: m)
-                                        print("Pressed")
+                                    if m.mac == currentMac {
+                                        Spacer()
+                                        Button("", systemImage: "minus.circle") {
+                                            deleteMessage(message: m)
+                                            print("Pressed")
+                                        }
+                                        Spacer()
+                                        MessageComponentView(message: m, mac: currentMac, showDate: false)
                                     }
-                                    Spacer()
-                                    MessageComponentView(message: m, mac: currentMac, showDate: false)
                                 }
                                 else {
                                     MessageComponentView(message: m, mac: currentMac)
