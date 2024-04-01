@@ -77,10 +77,16 @@ struct AdvancedView: View {
 
 struct BluetoothDevicesView: View {
     @StateObject var bluetoothManager = BluetoothManager()
+    @State private var selectedDevice: CBPeripheral? = nil
     
     var body: some View {
         List(bluetoothManager.devices, id: \.self) { device in
-            Text(device.name ?? "Unknown Device")
+            Button(action: {
+                selectedDevice = device
+                bluetoothManager.connect(peripheral: device)
+            }) {
+                Text(device.name ?? "Unknown Device")
+            }
         }
         .onAppear {
             bluetoothManager.scanForDevices()
@@ -90,6 +96,7 @@ struct BluetoothDevicesView: View {
 
 class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
     private var centralManager: CBCentralManager!
+    private var connectedPeripheral: CBPeripheral?
     @Published var devices: [CBPeripheral] = []
     
     override init() {
@@ -107,6 +114,10 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
         }
     }
     
+    func connect(peripheral: CBPeripheral) {
+        centralManager.connect(peripheral, options: nil)
+    }
+    
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -114,6 +125,20 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
                 self.devices.append(peripheral)
             }
         }
+    }
+    
+    func sendMessage(_ message: String) {
+        guard let connectedPeripheral = connectedPeripheral else {
+            print("Not connected to a device.")
+            return
+        }
+        
+        guard let data = message.data(using: .utf8) else {
+            print("Message failed to convert.")
+            return
+        }
+        
+        connectedPeripheral.writeValue(data, for: <#Characteristic#>, type: .withoutResponse)
     }
 }
 
