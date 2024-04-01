@@ -14,10 +14,8 @@ struct MessageView: View {
     // context to create, edit, and modify core data objects
     @Environment(\.managedObjectContext) private var viewContext
     
-    
     // Current mac address we chatting / viewing
     var currentMac:String = "1:1:1:1"
-
     
     // Get all messages sorted by ascending date
     // TODO: only for the mac address used
@@ -28,7 +26,6 @@ struct MessageView: View {
         animation: .default)
     private var messages: FetchedResults<Message>
     
-    
     // get a list of all contacts
     @FetchRequest(
         sortDescriptors: [
@@ -37,49 +34,104 @@ struct MessageView: View {
         animation: .default)
     private var contacts: FetchedResults<Contact>
     
-    
     // State variable: what is stored in the Message... box
     @State private var messageBoxContent:String = ""
+    
+    // Stores the id of the last message in the scroll view to scroll to
+    @State var messageIdToSetVisible: UUID?
+    
+    // Edit mode for deleting messages
+    @State var editMode = false
+    
+    @State var deleteAllShowConfirmation = false
+    
 
     var body: some View {
 
         NavigationView{
             VStack {
                 
-                // Display the messages
-                ScrollView {
-
-                    ForEach(Array(zip(messages.indices, messages)), id: \.0) { i, m in
-                        if m.mac == currentMac {
-                            if m.recieved {
-                                OneMessageRecieved(message: m)
+                ScrollViewReader { scrollProxy in
+                    
+                    ScrollView {
+                        
+                        ForEach(self.messages) { m in
+                            HStack {
+                                if (editMode) {
+                                    if m.mac == currentMac {
+                                        Spacer()
+                                        Button("", systemImage: "minus.circle") {
+                                            deleteMessage(message: m)
+                                            print("Pressed")
+                                        }
+                                        Spacer()
+                                        MessageComponentView(message: m, mac: currentMac, showDate: false)
+                                    }
+                                }
+                                else {
+                                    MessageComponentView(message: m, mac: currentMac)
+                                }
                             }
-                            else {
-                                OneMessageSentView(message: m)
-                            }
+                                .id(m.id)
+                        }
+                        
+                    }
+                    .onChange(of: self.messageIdToSetVisible) { id in
+                        withAnimation {
+                            scrollProxy.scrollTo(id)
                         }
                     }
+                    .onAppear {
+                        scrollProxy.scrollTo(self.messages.last?.id)
+                    }
+                    
                 }
                 
-                // Bottom row (send message, coordinates, other button)
-                HStack {
-                    // Display the chat box
-                    TextField("Message...", text: $messageBoxContent)
-                        .padding(.horizontal, 30)
-                        .onSubmit {
-                            addMessage(recieved: false)
-//                            $messageBoxContent = ""
-                            print("Adding")
+                // Bottom row
+                // Not in edit mode: text input, coordinate send
+                if !editMode {
+                    
+                    HStack {
+                        // Display the chat box
+                        TextField("Message...", text: $messageBoxContent)
+                            .padding(.horizontal, 30)
+                            .onSubmit {
+                                addMessage(recieved: false)
+                                messageBoxContent = ""
+                                print("Adding")
+                            }
+                        
+                        // Button to send coordinates
+                        Button("", systemImage: "location.circle", action: {addMessage(recieved: false, location: true)})
+                            .padding(.horizontal, 10)
+                        
+                        // Test button to recieve a message
+                        Button("", systemImage: "arrowshape.left", action: {addMessage(recieved: true, content: "recieved message")})
+                            .padding(.horizontal, 10)
+                        
+                    }
+                }
+                // Not in edit mode: delete all button
+                else {
+                    HStack {
+                        
+                        Spacer()
+                        Button("Delete All") {
+                            print("Delete All")
+                            deleteAllShowConfirmation = true
                         }
-                    
-                    // Button to send coordinates
-                    Button("", systemImage: "location.circle", action: {addMessage(recieved: false, location: true)})
-                        .padding(.horizontal, 10)
-                    
-                    // Test button to recieve a message
-                    Button("", systemImage: "arrowshape.left", action: {addMessage(recieved: true, content: "recieved message")})
-                        .padding(.horizontal, 10)
-
+                        .confirmationDialog("Are you sure you want to delete every message?",
+                                            isPresented: $deleteAllShowConfirmation,
+                                            titleVisibility: .visible
+                        ) {
+                            Button("Yes", role: .destructive) {
+                                // TODO: delete all
+                                print("Delete All")
+                                deleteAllMessages(messages: self.messages, mac: currentMac)
+                            }
+                        }
+                        Spacer()
+                    }
                 }
                 
                 
@@ -102,10 +154,18 @@ struct MessageView: View {
                 }
                 
                 // TODO: delete messages
+                // TODO: animation
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Spacer()
-                    Button("", systemImage: "square.and.pencil") {
-                        print("Pressed")
+                    if !editMode {
+                        Button("", systemImage: "square.and.pencil") {
+                            editMode = !editMode
+                        }
+                    }
+                    else {
+                        Button("Done") {
+                            editMode = !editMode
+                        }
                     }
                     Spacer()
                     
@@ -131,6 +191,7 @@ struct MessageView: View {
             // Create the new message
             let newMessage = Message(context: viewContext)
             newMessage.date = Date()
+            newMessage.id = UUID()
             newMessage.content = content
             newMessage.recieved = recieved
             newMessage.mac = currentMac
@@ -148,6 +209,7 @@ struct MessageView: View {
             // Save the message
             do {
                 try viewContext.save()
+                messageIdToSetVisible = newMessage.id
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -173,10 +235,9 @@ struct MessageView: View {
 //    }
     
 //    private func deleteMessage(offsets: IndexSet) {
-    private func deleteMessage(index: Int) {
+    private func deleteMessage(message: Message) {
         withAnimation {
-//            offsets.map { items[$0] }.forEach(viewContext.delete)
-            viewContext.delete(messages[index])
+            viewContext.delete(message)
 
             do {
                 try viewContext.save()
@@ -186,6 +247,18 @@ struct MessageView: View {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
+        }
+    }
+    
+    private func deleteAllMessages(messages: FetchedResults<Message>, mac: String) {
+        withAnimation {
+            
+            for m in messages {
+                if m.mac == mac {
+                    deleteMessage(message: m)
+                }
+            }
+            
         }
     }
     
@@ -205,6 +278,8 @@ struct MessageView: View {
     
 }
 
+
+
     
 
 //
@@ -212,6 +287,7 @@ struct OneMessageSentView: View {
     
     // Stores the message datastructure
     var message: Message
+    var showDate: Bool = true
     
     var body: some View {
         
@@ -224,10 +300,12 @@ struct OneMessageSentView: View {
                     .padding(.horizontal, 10.0)
                     .background(.blue)
                     .frame(width: UIScreen.main.bounds.size.width / 1.5, alignment: .bottomTrailing)
-                Spacer()
-                Text(timestampFormatter.string(from: message.date!))
-                    .padding(.horizontal, 10.0)
-                    .frame(width: UIScreen.main.bounds.size.width / 3.5, alignment: .bottomTrailing)
+                if showDate {
+                    Spacer()
+                    Text(timestampFormatter.string(from: message.date!))
+                        .padding(.horizontal, 10.0)
+                        .frame(width: UIScreen.main.bounds.size.width / 3.5, alignment: .bottomTrailing)
+                }
             }
             .padding([.top, .leading, .bottom], 10)
             
@@ -243,6 +321,7 @@ struct OneMessageRecieved: View {
     
     // Stores the message for
     var message: Message
+    var showDate: Bool = true
     
     var body: some View {
         
@@ -256,14 +335,46 @@ struct OneMessageRecieved: View {
                     .background(.gray)
                     .frame(width: UIScreen.main.bounds.size.width / 1.5, alignment: .leading)
 //                    .cornerRadius(10)
-                Spacer()
-                Text(timestampFormatter.string(from: message.date!))
-                    .padding(.horizontal, 10.0)
-                    .frame(width: UIScreen.main.bounds.size.width / 3.5, alignment: .bottomTrailing)
+                if showDate {
+                    Spacer()
+                    Text(timestampFormatter.string(from: message.date!))
+                        .padding(.horizontal, 10.0)
+                        .frame(width: UIScreen.main.bounds.size.width / 3.5, alignment: .bottomTrailing)
+                }
             }
             .padding([.top, .leading, .bottom], 10)
             
         }.padding(0)
+    }
+}
+
+
+struct OneMessageView: View {
+    
+    var body: some View {
+        Text("tmp")
+    }
+}
+
+
+// View for displaying the messages
+struct MessageComponentView: View {
+    
+    // Stores the message datastructure
+    var message: Message
+    var mac: String
+    var showDate: Bool = true
+    
+    var body: some View {
+        // Display the message
+        if message.mac == mac {
+            if message.recieved {
+                OneMessageRecieved(message: message, showDate: showDate)
+            }
+            else {
+                OneMessageSentView(message: message, showDate: showDate)
+            }
+        }
     }
 }
 
