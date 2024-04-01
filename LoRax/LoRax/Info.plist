@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>App communicates using Core Bluetooth</string>
+	</array>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Our app uses Bluetooth to connect to the LoRax device and transfer messages</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Our app uses Bluetooth to connect to the LoRax device and transfer messages</string>
+</dict>
+</plist>

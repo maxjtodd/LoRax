@@ -139,6 +139,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
         }
         
         connectedPeripheral.writeValue(data, for: <#Characteristic#>, type: .withoutResponse)
+        // need to figure out what "Characteristic" needs to be
     }
 }
 
