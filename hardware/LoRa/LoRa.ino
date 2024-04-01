@@ -1,7 +1,11 @@
+#include <Arduino.h>
+#include "tinyECC.h"
 #include "LoRaWan_APP.h"
 #include <Wire.h>               
 #include "HT_SSD1306Wire.h"
-#include "Arduino.h"
+
+//#include "HT_SSD1306Wire.h"
+
 
 
 #define RF_FREQUENCY                                915000000 // Hz
