@@ -46,6 +46,7 @@ struct PersistenceController {
             newContact.mac = "1:1:1:\(i)"
             newContact.fName = "User\(i)"
             newContact.lName = "US\(i)"
+            newContact.id = UUID()
         }
         do {
             try viewContext.save()

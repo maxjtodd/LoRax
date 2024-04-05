@@ -125,7 +125,6 @@ struct MessageView: View {
                                             titleVisibility: .visible
                         ) {
                             Button("Yes", role: .destructive) {
-                                // TODO: delete all
                                 print("Delete All")
                                 deleteAllMessages(messages: self.messages, mac: currentMac)
                             }

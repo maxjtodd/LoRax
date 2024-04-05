@@ -33,22 +33,25 @@ struct ContactView: View {
     
     var body: some View {
         
-        // Display contact list
-        if (!addingContact) {
-            NavigationView {
+        // Display the contacts if not adding contact
+        NavigationView {
+            
+            if (!addingContact) {
                 
-                // Display the contacts if not adding contact
-                
-                List(contacts, selection: $multiSelection) {
-                    ContactListSlot(contact: $0)
+                // Display contact list
+                List {
+                    ForEach(self.contacts) { c in
+                        ContactListSlot(contact: c)
+                    }
+                    .onDelete(perform: deleteContactAtIndex)
                 }
                 .navigationTitle("Contacts")
                 .toolbar {
                     ToolbarItemGroup(placement: .topBarLeading) {
                         Spacer()
                         Button("", systemImage: "plus") {
-                            print("Pressed")
                             addingContact = true
+                            print(addingContact)
                         }
                         Spacer()
                         
@@ -62,38 +65,26 @@ struct ContactView: View {
                     }
                 }
                 
-                //TODO: List all message history of non-contacts
-                
-            }.navigationBarHidden(true)
+            }
             
-        }
-        
-        // Display adding contact
-        else {
-            
-            NavigationView {
+            //TODO: List all message history of non-contacts
+            else {
                 VStack {
                     
-                    TextField(
-                        "First Name",
-                        text: $fName
-                    )
-                        
-                    TextField(
-                        "Last Name",
-                        text: $lName
-                    )
-                        
-                    
-                    TextField(
-                        "MAC",
-                        text: $mac
-                    )
-                        
+                    TextField("First Name", text: $fName)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    TextField("Last Name", text: $lName)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    TextField("MAC",text: $mac)
+                        .multilineTextAlignment(.center)
+                        .padding()
                     Button("Add") {
                         addContact(fName: fName, lName: lName, mac: mac)
                         addingContact = false
                     }
+                        .padding()
                     
                     
                 }
@@ -103,16 +94,16 @@ struct ContactView: View {
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Spacer()
                         Button("Cancel") {
-                            print("Pressed")
                             addingContact = false
+                            print(addingContact)
                         }
                         Spacer()
                         
                     }
                 }
             }
-            .navigationBarHidden(true)
-        }
+            
+        }.navigationBarHidden(true)
     }
     
     
@@ -142,6 +133,36 @@ struct ContactView: View {
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
             
+        }
+        
+    }
+    
+    
+    /// Delete a contact permanently from core data
+    /// - Parameter contact: Contact to delete
+    private func deleteContact(contact: Contact) {
+        withAnimation {
+            viewContext.delete(contact)
+
+            do {
+                try viewContext.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+    
+    
+    /// Delete a contact permanently from core data given index in fetch request
+    /// - Parameter contact: Contact to delete
+    private func deleteContactAtIndex(offsets: IndexSet) {
+        
+        for i in offsets {
+            let contact: Contact = contacts[i]
+            deleteContact(contact: contact)
         }
         
     }
