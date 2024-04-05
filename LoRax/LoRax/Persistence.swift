@@ -57,6 +57,26 @@ struct PersistenceController {
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
         
+        for i in 0..<3 {
+            // create contact
+//            let newNonContact = NonContact(context: viewContext)
+//            newContact.mac = "1:1:1:\(i)"
+//            newContact.fName = "User\(i)"
+//            newContact.lName = "US\(i)"
+//            newContact.id = UUID()
+            let newNonContact = NonContact(context: viewContext)
+            newNonContact.id = UUID()
+            newNonContact.mac = "2:1:1:\(i)"
+        }
+        do {
+            try viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        
         return result
     }()
 

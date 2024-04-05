@@ -13,4 +13,8 @@
         <attribute name="mac" optional="YES" attributeType="String"/>
         <attribute name="recieved" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
     </entity>
+    <entity name="NonContact" representedClassName="NonContact" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="mac" optional="YES" attributeType="String"/>
+    </entity>
 </model>

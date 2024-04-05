@@ -22,6 +22,14 @@ struct ContactView: View {
         animation: .default)
     private var contacts: FetchedResults<Contact>
     
+    // get a list of all non contacts
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \NonContact.mac, ascending: true)
+        ],
+        animation: .default)
+    private var nonContacts: FetchedResults<NonContact>
+    
     // stores the selected components in edit mode
     @State private var multiSelection = Set<UUID>()
     
@@ -38,12 +46,21 @@ struct ContactView: View {
             
             if (!addingContact) {
                 
-                // Display contact list
                 List {
+                    
+                    // Display Contacts
                     ForEach(self.contacts) { c in
                         ContactListSlot(contact: c)
                     }
                     .onDelete(perform: deleteContactAtIndex)
+                    
+                    // Display Non Contacts
+                    Section(header: Text("Non-Contacts")) {
+                        ForEach(self.nonContacts) { nc in
+                            nonContactListSlot(nonContact: nc)
+                        }
+
+                    }
                 }
                 .navigationTitle("Contacts")
                 .toolbar {
@@ -65,9 +82,10 @@ struct ContactView: View {
                     }
                 }
                 
+                
+                
             }
             
-            //TODO: List all message history of non-contacts
             else {
                 VStack {
                     
@@ -177,18 +195,27 @@ struct ContactListSlot: View {
     var contact: Contact
     
     var body: some View {
-        
         HStack {
-            
             NavigationLink(destination: MessageView(currentMac: contact.mac!).toolbar(.hidden, for: .tabBar)) {
                 Text("\(contact.lName!), \(contact.fName!)    -> \(contact.mac!)")
             }
-            
-            
         }
-        
     }
+}
+
+@available(iOS 16.0, *)
+struct nonContactListSlot: View {
     
+    // Stores the contact
+    var nonContact: NonContact
+    
+    var body: some View {
+        HStack {
+            NavigationLink(destination: MessageView(currentMac: nonContact.mac!).toolbar(.hidden, for: .tabBar)) {
+                Text("\(nonContact.mac!)")
+            }
+        }
+    }
 }
 
 
