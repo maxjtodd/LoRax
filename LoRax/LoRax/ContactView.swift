@@ -58,6 +58,13 @@ struct ContactView: View {
                     Section(header: Text("Non-Contacts")) {
                         ForEach(self.nonContacts) { nc in
                             nonContactListSlot(nonContact: nc)
+                                .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
+                                    
+                                    Button {createFromNonContact(nonContact: nc)} label: {
+                                        Label("Add Contact", systemImage: "plus.circle")
+                                    }
+                                        .tint(.green)
+                                }
                         }
 
                     }
@@ -67,6 +74,9 @@ struct ContactView: View {
                     ToolbarItemGroup(placement: .topBarLeading) {
                         Spacer()
                         Button("", systemImage: "plus") {
+                            fName = ""
+                            lName = ""
+                            mac = ""
                             addingContact = true
                             print(addingContact)
                         }
@@ -98,6 +108,7 @@ struct ContactView: View {
                     TextField("MAC",text: $mac)
                         .multilineTextAlignment(.center)
                         .padding()
+                    
                     Button("Add") {
                         addContact(fName: fName, lName: lName, mac: mac)
                         addingContact = false
@@ -132,6 +143,14 @@ struct ContactView: View {
     ///   - lName: last name of the contact to add
     ///   - mac: mac address of the contact to add
     private func addContact(fName: String, lName: String, mac: String) {
+        
+        // TODO: Delete non contact
+        // Delete non contact, adding as a new contact
+        for nc in nonContacts {
+            if nc.mac == mac {
+                deleteNonContact(nonContact: nc)
+            }
+        }
         
         withAnimation{
             
@@ -182,6 +201,34 @@ struct ContactView: View {
             let contact: Contact = contacts[i]
             deleteContact(contact: contact)
         }
+        
+    }
+    
+    
+    /// Delete non contact permanently from core data
+    /// - Parameter nonContact: nonContact to delete
+    private func deleteNonContact(nonContact: NonContact) {
+        withAnimation {
+            viewContext.delete(nonContact)
+
+            do {
+                try viewContext.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+    
+    
+    private func createFromNonContact(nonContact: NonContact) {
+        
+        // Switch to add contact page and autofil mac address
+        addingContact = true
+        mac = nonContact.mac!
+        print(mac)
         
     }
     
