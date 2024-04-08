@@ -17,7 +17,7 @@ struct ContactView: View {
     // get a list of all contacts
     @FetchRequest(
         sortDescriptors: [
-            NSSortDescriptor(keyPath: \Contact.mac, ascending: true)
+            NSSortDescriptor(keyPath: \Contact.lName, ascending: true)
         ],
         animation: .default)
     private var contacts: FetchedResults<Contact>
@@ -39,20 +39,76 @@ struct ContactView: View {
     @State private var lName: String = ""
     @State private var mac: String = ""
     
+    // Properties for deleting contact
+    @State private var deletingContact = false
+    @State private var deletingMac: String = ""
+    @State private var deletingFName: String = ""
+    @State private var deletingLName: String = ""
+    
+    // Property for modifying contact
+    @State private var modifyingContact = false
+    
+    // UI
     var body: some View {
         
         // Display the contacts if not adding contact
         NavigationView {
             
-            if (!addingContact) {
+            // Not adding contact, display regular contact screen
+            if (!addingContact && !modifyingContact) {
                 
                 List {
                     
                     // Display Contacts
                     ForEach(self.contacts) { c in
                         ContactListSlot(contact: c)
+                        
+                            // On Swipe Actions
+                            .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
+                                
+                                // Delete Contact
+                                Button(role: .destructive) {
+                                    deletingContact = true
+                                    deletingMac = c.mac!
+                                    deletingFName = c.fName!
+                                    deletingLName = c.lName!
+                                    self.deleteContact(contact: c)
+                                } label: {
+                                    Label("Delete Contact", systemImage: "trash")
+                                }
+                                .tint(.red)
+                                
+                                
+                                // Modify Contact
+                                Button() {
+                                    fName = c.fName!
+                                    lName = c.lName!
+                                    mac = c.mac!
+                                    modifyingContact = true
+                                } label: {
+                                    Label("Modify Contact", systemImage: "gear")
+                                }
+                                .tint(.orange)
+                            }
+                        
+                            // Confirm message deletion
+                            .confirmationDialog(
+                                Text("Delete contact data?"),
+                                isPresented: $deletingContact,
+                                titleVisibility: .visible
+                            ) {
+                                Button("Delete All Chat History", role: .destructive) {
+                                    deleteMessagesFromMac(mac: deletingMac)
+                                }
+                                Button("Cancel data deletion", role: .destructive) {
+                                    createNonContact(mac: deletingMac)
+                                }
+                                Button("Cancel", role: .cancel) {
+                                    _ = addContact(fName: deletingFName, lName: deletingLName, mac: deletingMac)
+                                }
+                            }
+                        
                     }
-                    .onDelete(perform: deleteContactAtIndex)
                     
                     // Display Non Contacts
                     Section(header: Text("Non-Contacts")) {
@@ -66,19 +122,16 @@ struct ContactView: View {
                                         .tint(.green)
                                 }
                         }
-
                     }
                 }
+                // Toolbar
                 .navigationTitle("Contacts")
                 .toolbar {
                     ToolbarItemGroup(placement: .topBarLeading) {
                         Spacer()
-                        Button("", systemImage: "plus") {
-                            fName = ""
-                            lName = ""
-                            mac = ""
-                            addingContact = true
-                            print(addingContact)
+                        Button("", systemImage: "minus") {
+                            deleteMessagesFromMac(mac: "1:1:1:1")
+                            let _ = addContact(fName: "f", lName: "l", mac: "1:1:1:1")
                         }
                         Spacer()
                         
@@ -86,17 +139,21 @@ struct ContactView: View {
                     
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Spacer()
-                        EditButton()
+                        Button("", systemImage: "plus") {
+                            fName = ""
+                            lName = ""
+                            mac = ""
+                            addingContact = true
+//                            print(addingContact)
+                        }
                         Spacer()
                         
                     }
                 }
-                
-                
-                
             }
             
-            else {
+            // Adding contact, display adding contact screen
+            else if (addingContact) {
                 VStack {
                     
                     TextField("First Name", text: $fName)
@@ -110,7 +167,8 @@ struct ContactView: View {
                         .padding()
                     
                     Button("Add") {
-                        addContact(fName: fName, lName: lName, mac: mac)
+                        let added = addContact(fName: fName, lName: lName, mac: mac)
+                        print("added: \(added)")
                         addingContact = false
                     }
                         .padding()
@@ -124,12 +182,58 @@ struct ContactView: View {
                         Spacer()
                         Button("Cancel") {
                             addingContact = false
-                            print(addingContact)
+                            fName = ""
+                            lName = ""
+                            mac = ""
+//                            print(addingContact)
                         }
                         Spacer()
                         
                     }
                 }
+            }
+            
+            // Modifying contact, display editing contact screen
+            else {
+                
+                VStack {
+                    
+                    TextField("First Name", text: $fName)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    TextField("Last Name", text: $lName)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    Text(mac)
+                        .padding()
+                        .foregroundColor(.gray)
+                    
+                    Button("Modify") {
+
+                        
+                        modifyingContact = false
+                    }
+                        .padding()
+                    
+                    
+                }
+                .navigationTitle("Modify Contact")
+                .toolbar {
+                    
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Spacer()
+                        Button("Cancel") {
+                            modifyingContact = false
+                            fName = ""
+                            lName = ""
+                            mac = ""
+//                            print(addingContact)
+                        }
+                        Spacer()
+                        
+                    }
+                }
+                
             }
             
         }.navigationBarHidden(true)
@@ -142,35 +246,61 @@ struct ContactView: View {
     ///   - fName: first name of the contact to add
     ///   - lName: last name of the contact to add
     ///   - mac: mac address of the contact to add
-    private func addContact(fName: String, lName: String, mac: String) {
+    private func addContact(fName: String, lName: String, mac: String) -> Bool {
         
-        // TODO: Delete non contact
-        // Delete non contact, adding as a new contact
+        // Determine if the mac is being used by another contact
+        let request: NSFetchRequest<Contact> = Contact.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+                
+        // Send fetch request to see if mac exists
+        do {
+            
+            // Mac exists, don't add
+            let c = try viewContext.fetch(request).first
+            if c != nil {
+                print("At least one contact with mac \(mac)")
+                return false
+            }
+            
+        }
+        // Error
+        catch {
+            print("Error adding contact - couldn't fetch")
+            return false
+        }
+        
+        // Delete non contact if non contact exists with that mac, adding as a new contact
         for nc in nonContacts {
             if nc.mac == mac {
                 deleteNonContact(nonContact: nc)
             }
         }
         
-        withAnimation{
+        // Set up returning variable
+        var returner = false
+        withAnimation {
             
             // Create the new contact
             let newContact = Contact(context: viewContext)
             newContact.fName = fName
             newContact.lName = lName
             newContact.mac = mac
+            newContact.id = UUID()
             
             // Save the contact
             do {
                 try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                returner = true
+            }
+            // contact didn't save
+            catch {
+                print("Error adding contact - couldn't save")
+                returner = false
             }
             
         }
+        return returner
         
     }
     
@@ -193,6 +323,19 @@ struct ContactView: View {
     }
     
     
+    
+    /// Modify a contact with the new parameters
+    ///  Creates new non-contact if changing to a mac that isn't used
+    /// - Parameters:
+    ///   - mac: Mac of the contact to modify
+    ///   - fName: New first name to set
+    ///   - lName: New last name to set
+    private func modifyContact(mac: String, fName: String, lName: String) {
+        
+        // Get the contact of the
+    }
+    
+    
     /// Delete a contact permanently from core data given index in fetch request
     /// - Parameter contact: Contact to delete
     private func deleteContactAtIndex(offsets: IndexSet) {
@@ -201,6 +344,60 @@ struct ContactView: View {
             let contact: Contact = contacts[i]
             deleteContact(contact: contact)
         }
+        
+    }
+    
+            
+    /// Add a new non-contact
+    /// - Parameter mac: Mac of the new non contact
+    /// - Returns: Success of addition
+    private func createNonContact(mac: String) -> Bool {
+        
+        // Determine if the mac is being used by another contact
+        let request: NSFetchRequest<NonContact> = NonContact.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+                
+        // Send fetch request to see if mac exists
+        do {
+            
+            // Mac exists, don't add
+            let nc = try viewContext.fetch(request).first
+            if nc != nil {
+                print("At least one contact with mac \(mac)")
+                return false
+            }
+            
+        }
+        // Error
+        catch {
+            print("ERROR createNonContact")
+        }
+        
+        // Set up return values
+        var returner = false
+        withAnimation {
+            
+            // Create the new non contact
+            let newNonContact = NonContact(context: viewContext)
+            let stringy: String
+            stringy = mac
+            newNonContact.mac = stringy
+            newNonContact.id = UUID()
+            
+            // Save the non contact
+            do {
+                try viewContext.save()
+                returner = true
+            }
+            // non contact didn't save
+            catch {
+                print("Error adding contact - couldn't save")
+                returner = false
+            }
+        }
+        
+        return returner
         
     }
     
@@ -223,14 +420,55 @@ struct ContactView: View {
     }
     
     
+    /// Start creating contact from a non contact message history
+    /// - Parameter nonContact: Non contact to start creating contact for
     private func createFromNonContact(nonContact: NonContact) {
         
         // Switch to add contact page and autofil mac address
         addingContact = true
+        fName = ""
+        lName = ""
         mac = nonContact.mac!
-        print(mac)
         
     }
+    
+    
+    /// Delete inputted message
+    /// - Parameter message: Message to be deleted
+    private func deleteMessage(message: Message) {
+        
+        viewContext.delete(message)
+
+        do {
+            try viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        
+    }
+    
+    
+    /// Delete all messages from a contact, used when deleting a contact
+    /// - Parameter mac: Mac of the contact to be deleted
+    private func deleteMessagesFromMac(mac: String) {
+        
+        let request: NSFetchRequest<Message> = Message.fetchRequest()
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+        
+        do {
+            let messages = try viewContext.fetch(request)
+            for m in messages {
+               deleteMessage(message: m)
+            }
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
+    
     
 }
 
@@ -242,10 +480,15 @@ struct ContactListSlot: View {
     var contact: Contact
     
     var body: some View {
-        HStack {
-            NavigationLink(destination: MessageView(currentMac: contact.mac!).toolbar(.hidden, for: .tabBar)) {
-                Text("\(contact.lName!), \(contact.fName!)    -> \(contact.mac!)")
+        if contact.mac != nil {
+            HStack {
+                NavigationLink(destination: MessageView(currentMac: contact.mac!).toolbar(.hidden, for: .tabBar)) {
+                    Text("\(contact.lName!), \(contact.fName!)    -> \(contact.mac!)")
+                }
             }
+        }
+        else {
+            HStack{}
         }
     }
 }
