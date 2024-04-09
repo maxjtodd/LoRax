@@ -18,7 +18,7 @@ struct PersistenceController {
             
             // create messages
             let newMessage = Message(context: viewContext)
-            newMessage.mac = "1:1:1:1"
+            newMessage.mac = "A1:B2:C3:D4:E5:F1"
             newMessage.content = "hello world"
             newMessage.date = Date()
             if (i % 2 == 0) {
@@ -43,7 +43,7 @@ struct PersistenceController {
         for i in 0..<10 {
             // create contact
             let newContact = Contact(context: viewContext)
-            newContact.mac = "1:1:1:\(i)"
+            newContact.mac = "A1:B2:C3:D4:E5:F\(i)"
             newContact.fName = "User\(i)"
             newContact.lName = "US\(i)"
             newContact.id = UUID()
@@ -58,15 +58,10 @@ struct PersistenceController {
         }
         
         for i in 0..<3 {
-            // create contact
-//            let newNonContact = NonContact(context: viewContext)
-//            newContact.mac = "1:1:1:\(i)"
-//            newContact.fName = "User\(i)"
-//            newContact.lName = "US\(i)"
-//            newContact.id = UUID()
+            // create non contact
             let newNonContact = NonContact(context: viewContext)
             newNonContact.id = UUID()
-            newNonContact.mac = "2:1:1:\(i)"
+            newNonContact.mac = "F1:B2:C3:D4:E5:F6"
         }
         do {
             try viewContext.save()

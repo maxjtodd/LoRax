@@ -101,7 +101,7 @@ struct ContactView: View {
                                     deleteMessagesFromMac(mac: deletingMac)
                                 }
                                 Button("Cancel data deletion", role: .destructive) {
-                                    createNonContact(mac: deletingMac)
+                                    _ = createNonContact(mac: deletingMac)
                                 }
                                 Button("Cancel", role: .cancel) {
                                     _ = addContact(fName: deletingFName, lName: deletingLName, mac: deletingMac)
@@ -130,8 +130,8 @@ struct ContactView: View {
                     ToolbarItemGroup(placement: .topBarLeading) {
                         Spacer()
                         Button("", systemImage: "minus") {
-                            deleteMessagesFromMac(mac: "1:1:1:1")
-                            let _ = addContact(fName: "f", lName: "l", mac: "1:1:1:1")
+                            let v = validateMac(mac: "00:1A:2B:3C:4D:5E")
+                            print(v)
                         }
                         Spacer()
                         
@@ -241,12 +241,29 @@ struct ContactView: View {
     
     
     
+    /// Determine if the inputted mac add
+    /// - Parameter mac: Mac address to validate
+    /// - Returns: True if mac address is valid, false if not
+    private func validateMac(mac: String) -> Bool {
+        let macRegex = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+        let macTest = NSPredicate(format: "SELF MATCHES %@", macRegex)
+        return macTest.evaluate(with: mac)
+    }
+    
+    
     /// Add a contact permanently into core data
     /// - Parameters:
     ///   - fName: first name of the contact to add
     ///   - lName: last name of the contact to add
     ///   - mac: mac address of the contact to add
     private func addContact(fName: String, lName: String, mac: String) -> Bool {
+        
+        // Validate mac address
+        let valid = validateMac(mac: mac)
+        if !valid {
+            print("Not adding... MAC not valid.")
+            return false
+        }
         
         // Determine if the mac is being used by another contact
         let request: NSFetchRequest<Contact> = Contact.fetchRequest()
@@ -323,7 +340,6 @@ struct ContactView: View {
     }
     
     
-    
     /// Modify a contact with the new parameters
     ///  Creates new non-contact if changing to a mac that isn't used
     /// - Parameters:
@@ -352,6 +368,13 @@ struct ContactView: View {
     /// - Parameter mac: Mac of the new non contact
     /// - Returns: Success of addition
     private func createNonContact(mac: String) -> Bool {
+        
+        // Validate mac address
+        let valid = validateMac(mac: mac)
+        if !valid {
+            print("Not adding... MAC not valid.")
+            return false
+        }
         
         // Determine if the mac is being used by another contact
         let request: NSFetchRequest<NonContact> = NonContact.fetchRequest()
@@ -469,11 +492,11 @@ struct ContactView: View {
         }
     }
     
-    
 }
 
 
 @available(iOS 16.0, *)
+/// UI list to navigate to the chat history for the given contact
 struct ContactListSlot: View {
     
     // Stores the contact
@@ -493,7 +516,9 @@ struct ContactListSlot: View {
     }
 }
 
+
 @available(iOS 16.0, *)
+/// UI list to navigate to the chat history for the given non contact
 struct nonContactListSlot: View {
     
     // Stores the contact
