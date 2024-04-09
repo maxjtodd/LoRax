@@ -137,6 +137,23 @@ struct ContactView: View {
                                         .tint(.red)
                                         
                                     }
+                                
+                                    // Confirm non contact deletion
+                                    .confirmationDialog(
+                                        Text("Are you sure? You will delete all the text data as well."),
+                                        isPresented: $deletingNonContact,
+                                        titleVisibility: .visible
+                                    ) {
+                                        // delete it all
+                                        Button("Yes, delete it all", role: .destructive) {
+                                            deleteMessagesFromMac(mac: deletingMac)
+                                        }
+                                        
+                                        // cancel, add non contact back into list
+                                        Button("Cancel", role: .cancel) {
+                                            _ = createNonContact(mac: deletingMac)
+                                        }
+                                    }
                             }
                         }
                     }
@@ -144,15 +161,15 @@ struct ContactView: View {
                 // Toolbar
                 .navigationTitle("Contacts")
                 .toolbar {
-                    ToolbarItemGroup(placement: .topBarLeading) {
-                        Spacer()
-                        Button("", systemImage: "minus") {
-                            let v = validateMac(mac: "00:1A:2B:3C:4D:5E")
-                            print(v)
-                        }
-                        Spacer()
-                        
-                    }
+//                    ToolbarItemGroup(placement: .topBarLeading) {
+//                        Spacer()
+//                        Button("", systemImage: "minus") {
+//                            let v = validateMac(mac: "00:1A:2B:3C:4D:5E")
+//                            print(v)
+//                        }
+//                        Spacer()
+//                        
+//                    }
                     
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Spacer()
