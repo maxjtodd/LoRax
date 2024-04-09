@@ -61,7 +61,7 @@ struct PersistenceController {
             // create non contact
             let newNonContact = NonContact(context: viewContext)
             newNonContact.id = UUID()
-            newNonContact.mac = "F1:B2:C3:D4:E5:F6"
+            newNonContact.mac = "F1:B2:C3:D4:E5:F\(i)"
         }
         do {
             try viewContext.save()

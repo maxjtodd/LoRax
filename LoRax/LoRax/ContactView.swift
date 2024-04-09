@@ -45,6 +45,9 @@ struct ContactView: View {
     @State private var deletingFName: String = ""
     @State private var deletingLName: String = ""
     
+    // Properties for deleting non contact
+    @State private var deletingNonContact = false
+    
     // Property for modifying contact
     @State private var modifyingContact = false
     
@@ -63,7 +66,7 @@ struct ContactView: View {
                     ForEach(self.contacts) { c in
                         ContactListSlot(contact: c)
                         
-                            // On Swipe Actions
+                        // On Swipe Actions
                             .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
                                 
                                 // Delete Contact
@@ -91,7 +94,7 @@ struct ContactView: View {
                                 .tint(.orange)
                             }
                         
-                            // Confirm message deletion
+                        // Confirm message deletion
                             .confirmationDialog(
                                 Text("Delete contact data?"),
                                 isPresented: $deletingContact,
@@ -111,16 +114,30 @@ struct ContactView: View {
                     }
                     
                     // Display Non Contacts
-                    Section(header: Text("Non-Contacts")) {
-                        ForEach(self.nonContacts) { nc in
-                            nonContactListSlot(nonContact: nc)
-                                .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
-                                    
-                                    Button {createFromNonContact(nonContact: nc)} label: {
-                                        Label("Add Contact", systemImage: "plus.circle")
-                                    }
+                    if nonContacts.count > 0 {
+                        Section(header: Text("Non-Contacts")) {
+                            ForEach(self.nonContacts) { nc in
+                                nonContactListSlot(nonContact: nc)
+                                    .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
+                                        
+                                        // Create non contact
+                                        Button {createFromNonContact(nonContact: nc)} label: {
+                                            Label("Add Contact", systemImage: "plus.circle")
+                                        }
                                         .tint(.green)
-                                }
+                                        
+                                        // Delete Non Contact
+                                        Button(role: .destructive) {
+                                            deletingNonContact = true
+                                            deletingMac = nc.mac!
+                                            self.deleteNonContact(nonContact: nc)
+                                        } label: {
+                                            Label("Delete Non Contact", systemImage: "trash")
+                                        }
+                                        .tint(.red)
+                                        
+                                    }
+                            }
                         }
                     }
                 }
@@ -236,6 +253,7 @@ struct ContactView: View {
                     if (fName.count > 0 && lName.count > 0) {
                         Button("Modify") {
                             let modified = modifyContact(mac: mac, fName: fName, lName: lName)
+                            print("modified: \(modified)")
                             modifyingContact = false
                         }
                             .padding()
@@ -582,10 +600,15 @@ struct nonContactListSlot: View {
     var nonContact: NonContact
     
     var body: some View {
-        HStack {
-            NavigationLink(destination: MessageView(currentMac: nonContact.mac!).toolbar(.hidden, for: .tabBar)) {
-                Text("\(nonContact.mac!)")
+        if nonContact.mac != nil {
+            HStack {
+                NavigationLink(destination: MessageView(currentMac: nonContact.mac!).toolbar(.hidden, for: .tabBar)) {
+                    Text("\(nonContact.mac!)")
+                }
             }
+        }
+        else {
+            HStack{}
         }
     }
 }
