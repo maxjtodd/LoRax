@@ -144,7 +144,6 @@ struct ContactView: View {
                             lName = ""
                             mac = ""
                             addingContact = true
-//                            print(addingContact)
                         }
                         Spacer()
                         
@@ -208,7 +207,6 @@ struct ContactView: View {
                             fName = ""
                             lName = ""
                             mac = ""
-//                            print(addingContact)
                         }
                         Spacer()
                         
@@ -221,24 +219,33 @@ struct ContactView: View {
                 
                 VStack {
                     
+                    // Get input for first and last name, auto populated with contact edited
                     TextField("First Name", text: $fName)
                         .multilineTextAlignment(.center)
                         .padding()
                     TextField("Last Name", text: $lName)
                         .multilineTextAlignment(.center)
                         .padding()
+                    
+                    // Display mac address, don't allow user to change
                     Text(mac)
                         .padding()
                         .foregroundColor(.gray)
                     
-                    Button("Modify") {
-
-                        
-                        modifyingContact = false
+                    // Save the changes made to the contact
+                    if (fName.count > 0 && lName.count > 0) {
+                        Button("Modify") {
+                            let modified = modifyContact(mac: mac, fName: fName, lName: lName)
+                            modifyingContact = false
+                        }
+                            .padding()
                     }
-                        .padding()
-                    
-                    
+                    // Block modify button, fName or lName nil
+                    else {
+                        Text("Modify")
+                            .padding()
+                            .foregroundColor(.gray)
+                    }
                 }
                 .navigationTitle("Modify Contact")
                 .toolbar {
@@ -250,10 +257,8 @@ struct ContactView: View {
                             fName = ""
                             lName = ""
                             mac = ""
-//                            print(addingContact)
                         }
                         Spacer()
-                        
                     }
                 }
                 
@@ -369,9 +374,38 @@ struct ContactView: View {
     ///   - mac: Mac of the contact to modify
     ///   - fName: New first name to set
     ///   - lName: New last name to set
-    private func modifyContact(mac: String, fName: String, lName: String) {
+    private func modifyContact(mac: String, fName: String, lName: String) -> Bool {
         
-        // Get the contact of the
+        // Get the contact to be modified
+        let request: NSFetchRequest<Contact> = Contact.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+                
+        // Send fetch request to see if mac exists
+        do {
+            
+            // Get the contact
+            let contact = try viewContext.fetch(request).first
+            
+            // Contact doesn't exist
+            if contact == nil {
+                print("No contact could be found with mac: \(mac)")
+                return false
+            }
+            
+            // Modify the contact
+            contact!.fName = fName
+            contact!.lName = lName
+            
+            // Save the changes
+            try viewContext.save()
+            
+        }
+        // Error
+        catch {
+            print("Error finding / saving contact - couldn't fetch")
+        }
+        return false
     }
     
     
