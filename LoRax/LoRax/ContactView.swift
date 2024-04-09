@@ -156,23 +156,46 @@ struct ContactView: View {
             else if (addingContact) {
                 VStack {
                     
+                    // Get first and last name
                     TextField("First Name", text: $fName)
                         .multilineTextAlignment(.center)
                         .padding()
                     TextField("Last Name", text: $lName)
                         .multilineTextAlignment(.center)
                         .padding()
-                    TextField("MAC",text: $mac)
-                        .multilineTextAlignment(.center)
-                        .padding()
                     
-                    Button("Add") {
-                        let added = addContact(fName: fName, lName: lName, mac: mac)
-                        print("added: \(added)")
-                        addingContact = false
+                    // Get the mac address and display if its valid or not
+                    HStack {
+                        Spacer()
+                        TextField("MAC",text: $mac)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 300)
+                            .padding()
+                        if (!validateMac(mac: mac)) {
+                            Label("", systemImage: "xmark.circle")
+                                .padding(.trailing, CGFloat(230 - mac.count * 5))
+                        }
+                        else {
+                            Label("", systemImage: "checkmark.circle")
+                                .padding(.trailing, CGFloat(230 - mac.count * 5))
+                        }
+                        Spacer()
                     }
-                        .padding()
                     
+                    // Display the add button: gray out if no first name, no last name, and not valid mac
+                    if (validateMac(mac: mac) && fName.count > 0 && lName.count > 0) {
+                        Button("Add") {
+                            let added = addContact(fName: fName, lName: lName, mac: mac)
+                            print("added: \(added)")
+                            addingContact = false
+                        }
+                            .padding()
+                    }
+                    else {
+                        Text("Add")
+                            .padding()
+                            .foregroundColor(.gray)
+                    }
                     
                 }
                 .navigationTitle("Add Contact")
