@@ -67,7 +67,8 @@ struct AdvancedView: View {
             .padding()
             Spacer()
             if showBluetoothDevices {
-                BluetoothDevicesView()
+                Text("Placeholder")
+//                BluetoothDevicesView()
             }
             Spacer()
         }
@@ -138,7 +139,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
             return
         }
         
-        connectedPeripheral.writeValue(data, for: <#Characteristic#>, type: .withoutResponse)
+//        connectedPeripheral.writeValue(data, for: <#Characteristic#>, type: .withoutResponse)
         // need to figure out what "Characteristic" needs to be
     }
 }
