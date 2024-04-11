@@ -27,7 +27,7 @@
 #define LORA_IQ_INVERSION_ON                        false
 
 
-#define RX_TIMEOUT_VALUE                            1000
+#define RX_TIMEOUT_VALUE                            2000
 #define BUFFER_SIZE                                 30 // Define the payload size here
 #define ENCRYPTED_BUFFER_SIZE                       64
 #define DEBUG                                       1
@@ -97,15 +97,15 @@ void performKeyExchange() {
     Serial.print("Public Key: ");
     Serial.println(public_key);
     while (!sharedKey) {
+      // Receive public key from the other device
+      Radio.Rx(0);
+      Radio.IrqProcess();
+      
       // Send public key to the other device
       sprintf(txpacket, "%d", public_key);
       Radio.Send((uint8_t *)txpacket, strlen(txpacket));
       Radio.IrqProcess();
-
-      // Receive public key from the other device
-      delay(100); // Wait for the other device to send its public key
-      Radio.Rx(0);
-      Radio.IrqProcess();
+      
     }
 }
 
@@ -207,7 +207,7 @@ void setup() {
     
     performKeyExchange();
 
-    state = STATE_TX;
+    state = STATE_RX;
     //deriveEncryptionKey();
     //sharedKey = true;
 }
@@ -217,8 +217,6 @@ void loop() {
 
     switch (state) {
         case STATE_RX:
-
-            
             
             // Set radio to receive mode
             Radio.Rx(0);
