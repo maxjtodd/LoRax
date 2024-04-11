@@ -7,11 +7,11 @@
 
 import SwiftUI
 import CoreBluetooth
-
+import Foundation
 
 @available(iOS 16.0, *)
+
 struct ContentView: View {
-    
     @State private var tabSelection = 1
     
     var body: some View {
@@ -52,13 +52,16 @@ struct ChatView: View {
 
 
 struct AdvancedView: View {
-    @State private var showBluetoothDevices = false
+    @State private var showBluetoothMessages = false
+    @StateObject private var bluetoothViewModel = BluetoothViewModel()
+    @StateObject private var bluetoothService = BluetoothService()
+    
     var body: some View {
         VStack {
             Button(action: {
-                showBluetoothDevices.toggle()
+                showBluetoothMessages.toggle()
             }) {
-                Text("Show Bluetooth Devices")
+                Text("Show Bluetooth Messages")
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(Color.white)
@@ -66,8 +69,10 @@ struct AdvancedView: View {
             }
             .padding()
             Spacer()
-            if showBluetoothDevices {
-                BluetoothDevicesView()
+            if showBluetoothMessages {
+                BluetoothMessagesView()
+                    .environmentObject(bluetoothViewModel)
+                    .environmentObject(bluetoothService)
             }
             Spacer()
         }
@@ -75,74 +80,18 @@ struct AdvancedView: View {
 }
 
 
-struct BluetoothDevicesView: View {
-    @StateObject var bluetoothManager = BluetoothManager()
-    @State private var selectedDevice: CBPeripheral? = nil
+struct BluetoothMessagesView: View {
+    @EnvironmentObject var bluetoothViewModel: BluetoothViewModel
+    @EnvironmentObject var bluetoothService: BluetoothService
     
     var body: some View {
-        List(bluetoothManager.devices, id: \.self) { device in
-            Button(action: {
-                selectedDevice = device
-                bluetoothManager.connect(peripheral: device)
-            }) {
-                Text(device.name ?? "Unknown Device")
-            }
-        }
-        .onAppear {
-            bluetoothManager.scanForDevices()
+        VStack {
+            Text("Received Text: \(bluetoothViewModel.receivedMessage)")
+            .padding()
+        
         }
     }
 }
-
-class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
-    private var centralManager: CBCentralManager!
-    private var connectedPeripheral: CBPeripheral?
-    @Published var devices: [CBPeripheral] = []
-    
-    override init() {
-        super.init()
-        centralManager = CBCentralManager(delegate: self, queue: nil)
-    }
-    
-    func scanForDevices() {
-        centralManager.scanForPeripherals(withServices: nil, options: nil)
-    }
-    
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state == .poweredOn {
-            scanForDevices()
-        }
-    }
-    
-    func connect(peripheral: CBPeripheral) {
-        centralManager.connect(peripheral, options: nil)
-    }
-    
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            if !self.devices.contains(peripheral) {
-                self.devices.append(peripheral)
-            }
-        }
-    }
-    
-    func sendMessage(_ message: String) {
-        guard let connectedPeripheral = connectedPeripheral else {
-            print("Not connected to a device.")
-            return
-        }
-        
-        guard let data = message.data(using: .utf8) else {
-            print("Message failed to convert.")
-            return
-        }
-        
-        connectedPeripheral.writeValue(data, for: <#Characteristic#>, type: .withoutResponse)
-        // need to figure out what "Characteristic" needs to be
-    }
-}
-
 
 @available(iOS 16.0, *)
 struct ContentView_Previews: PreviewProvider {

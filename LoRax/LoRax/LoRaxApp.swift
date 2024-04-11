@@ -12,10 +12,13 @@ import SwiftUI
 struct LoRaxApp: App {
     let persistenceController = PersistenceController.shared
     
+    
+    
     var body: some Scene {
         WindowGroup {
-            MessageView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            ContentView()
+//            MessageView()
+//                .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
 }
