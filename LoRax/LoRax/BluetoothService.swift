@@ -92,7 +92,8 @@ extension BluetoothService: CBPeripheralDelegate {
                 print("No data received for \(characteristic.uuid.uuidString)")
                 return
             }
-            print(String(data: data, encoding: .utf8) ?? "unknown string")
+            
+            print("Received message: ", (String(data: data, encoding: .utf8) ?? "unknown string"))
             didReceiveMessage(data: data)
         }
     }
@@ -110,7 +111,6 @@ class BluetoothViewModel: ObservableObject {
     
     // Function to update the received text
     func updateReceivedMessage(newMessage: String) {
-        print("update got message: " + newMessage)
         receivedMessage = newMessage
     }
 }
