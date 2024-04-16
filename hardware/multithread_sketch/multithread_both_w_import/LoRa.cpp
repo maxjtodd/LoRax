@@ -1,8 +1,11 @@
 #include "LoRaWan_APP.h"
 #include <Wire.h>   
+#include <ctime>
+#include <chrono>
 #include "HT_SSD1306Wire.h"
 #include "Arduino.h"
 #include "LoRa.h"
+#include "shared_data.h"
 
 static RadioEvents_t RadioEvents;
 
@@ -24,16 +27,26 @@ char serial[100];
 char rxpacket[BUFFER_SIZE];
 
 extern RadioEvents_t RadioEvents;
-typedef enum
+enum State
 {
     STATE_RX,
-    STATE_TX
-}States_t;
-States_t state;
+    STATE_TX,
+    STATE_TX_CONTACT
+};
+State state;
 int16_t txNumber=0;
+int16_t pingCount = 0;
 int16_t rssi, rxSize;
 bool lora_idle=true;
 
+// Need a third type of message - ACK's
+// everytime we send a message out, we dont pop from the queue until we receive an ACK that corresponds to the message
+int ack_list[10];
+
+
+
+// global instance of messageData - contactPing
+messageData contactPing = {ESP.getEfuseMac(), NULL, NULL};
 
 void SendReceivecode(void* vpParameters) {
 
@@ -43,7 +56,6 @@ void SendReceivecode(void* vpParameters) {
 
   Mcu.begin();
   
-  txNumber=0;
   rssi=0;
 
   RadioEvents.RxDone = OnRxDone;
@@ -62,42 +74,67 @@ void SendReceivecode(void* vpParameters) {
                              LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
                              LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
                              0, true, 0, 0, LORA_IQ_INVERSION_ON, true );
-  state=STATE_TX;
+
+  state=STATE_TX_CONTACT; // default to sending contact ping
+
+  delay(2000); // delay 2s to allow for BLE setup
 
   for (;;) {
-    Serial.println("  Core 1 processing - send/receive");
-    delay(5000);
+    //Serial.println("  Core 1 processing - send/receive");
 
-    switch (state)
-    {
+    if (messageDataQueue_toLora.queue.size() >= 1) {
+      state=STATE_TX; // new message received from bluetooth
+    }
 
+
+    switch (state) {
+
+      // CASE - send contact ping
+      case STATE_TX_CONTACT:
+      {
+        Serial.println("Building Contact Ping");
+
+        // get current time
+        // auto now = std::chrono::system_clock::now();
+        // std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+        // append time to conactPing obj
+        // contactPing.messageSentTime = now_c;
+
+        // broadcast ping
+        pingCount++;
+        Serial.printf("Sending Ping: %d, %d\n", contactPing.id, pingCount);
+        sprintf(txpacket, "0;%d", contactPing.id);
+
+        Radio.Send( (uint8_t *)txpacket, strlen(txpacket) );
+        Radio.IrqProcess( );
+        delay(3000); // delay 2s
+      
+        break;
+      }
+      // CASE - message to send from iOS  
       case STATE_TX:
-        // display.clear();     
-        txNumber++;
-        sprintf(txpacket,"Hello world number %0.2f",txNumber);  //start a package
-        sprintf(serial, "\r\nsending packet, length %d\r\n", strlen(txpacket));
-        Serial.printf(serial);
-        // display.setFont(ArialMT_Plain_10);
-        // display.drawString(0, 10, txpacket);
-        // display.setFont(ArialMT_Plain_10);
-        // display.drawStringMaxWidth(0, 10, 128,serial);
-        // // write the buffer to the display
-        // display.display();
+      { // make explicit
+        txNumber++; // increment send count
+        messageData data_to_send = getMessageData(messageDataQueue_toLora); // get data_to_send to send
+        sprintf(txpacket, "LoRa message : id %d , size : %d, value : %s", data_to_send.id, data_to_send.size, data_to_send.value);
+        Serial.printf(txpacket);
         Radio.Send( (uint8_t *)txpacket, strlen(txpacket) ); //send the package out 
         Radio.IrqProcess( );
         break;
-      
+      }
+
+      // CASE - listen for incoming messages
       case STATE_RX:
-        // display.clear();
         lora_idle = false;
         Serial.println("into RX mode");
-        // display.setFont(ArialMT_Plain_10);
-        // display.drawString(0,10, "Waiting for packets...");
-        // display.display();
-        Radio.Rx(0);
+        Radio.Rx(0);             // start channel activity detection     
         Radio.IrqProcess( );
-        delay(10000);
-        state = STATE_TX;
+        delay(5000); // listen for 5s
+
+        // Send another contact ping
+        state = STATE_TX_CONTACT;
+
         break;
       
       default:
@@ -111,36 +148,52 @@ void SendReceivecode(void* vpParameters) {
 
 void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 {   
-    char result[100];
+    char result[100];                 // array to store resulting string 
     rssi=rssi;
     rxSize=size;
-    memcpy(rxpacket, payload, size );
-    rxpacket[size]='\0';
-    Radio.Sleep( );
+    memcpy(rxpacket, payload, size ); // copy message 
+    rxpacket[size]='\0';              // terminating char
+    Radio.Sleep( );                 
     sprintf(result,"\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",rxpacket,rssi,rxSize);
     Serial.printf(result);
-    // display.setFont(ArialMT_Plain_10);
-    // display.drawStringMaxWidth(0,20,128,result);
-    // display.display();
+
+    // THREE OPTIONS ON MESSAGE RECEIVE 
+        //  - Contact Ping - append to BT list w contantPing Designation
+        //  - Message      - append to BT list w Message Designation
+        //  - Ack of previous message send - pop associated message from LoRa queue
+
+    // Determine Packet type
+    if (rxpacket[0] == 0) {
+      Serial.println("Contact Ping Received");
+      
+      // send ack 
+    }
+    else if (rxpacket[0] == 1) {
+      Serial.println("Message Received - %s", payload);
+      // create new messageData object, append to list for BT
+      messageData data_to_send;
+      data_to_send.id = rssi;
+      data_to_send.size = size;
+      data_to_send.value = rxpacket;
+
+    }
+
+    else {
+      // ack from previous message received
+
+    }
+
     state = STATE_TX;
 }
 
 void OnTxDone( void )
 {
-  Serial.println("TX done......");
-  // display.setFont(ArialMT_Plain_10);
-  // display.drawString(0, 50, "TX done......");
-  // // write the buffer to the display
-  // display.display();
+  Serial.println("\nTX done......Switching to RX");
   state = STATE_RX;
 }
 
 void OnTxTimeout( void )
 {
     Radio.Sleep( );
-    Serial.println("TX Timeout......");
-    // display.setFont(ArialMT_Plain_10);
-    // display.drawString(0, 50, "TX Timeout......");
-    // // write the buffer to the display
-    // display.display();
+    Serial.println("\nTX Timeout......");
 }
