@@ -7,6 +7,7 @@
 
 #include "BluetoothHandler.h"
 #include "LoRa.h"
+#include "shared_data.h"
 
 
 TaskHandle_t Task0;
@@ -25,8 +26,12 @@ void setup() {
 
 void loop() {
   // nothing to do here, everything happens in the Task1Code and Task2Code functions
-  Serial.print("main loop on core ");
-  Serial.println(xPortGetCoreID());
+  //Serial.print("main loop on core ");
+
+  //Serial.printf("\nCHIP MAC: %012llx\n", ESP.getEfuseMac());
+  //Serial.printf("\nCHIP MAC: %012llx\n", ESP.getChipId());
+
+  //Serial.println(xPortGetCoreID());
   delay(5500);
 }
 
