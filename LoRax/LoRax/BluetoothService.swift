@@ -17,18 +17,17 @@ enum ConnectionStatus {
 }
 
 let loraxServiceUUID = CBUUID(string: "B99CFDBD-4F69-42AA-82DA-68B92D310DEA")
-let loraxTxCharacteristicUUID = CBUUID(string: "0F146B5F-2B7E-46A0-B246-36ED1867F6E7")
-let loraxRxCharacteristicUUID = CBUUID(string: "B54E3121-477C-4A86-9FE7-19292CFA415B")
+let loraxCharacteristicUUID = CBUUID(string: "0F146B5F-2B7E-46A0-B246-36ED1867F6E7")
+//let loraxRxCharacteristicUUID = CBUUID(string: "B54E3121-477C-4A86-9FE7-19292CFA415B")
 
 class BluetoothService: NSObject, ObservableObject {
-    var viewModel: BluetoothViewModel!
-    private var centralManager: CBCentralManager!
+    var centralManager: CBCentralManager!
     var loraxPeripheral: CBPeripheral?
+    @Published var message: String = "Haven't received a message!"
     @Published var peripheralStatus: ConnectionStatus = .disconnected
     
     override init() {
         super.init()
-        viewModel = BluetoothViewModel()
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
     
@@ -75,7 +74,7 @@ extension BluetoothService: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
         for service in peripheral.services ?? [] {
             if service.uuid == loraxServiceUUID {
-                peripheral.discoverCharacteristics([loraxTxCharacteristicUUID], for: service)
+                peripheral.discoverCharacteristics([loraxCharacteristicUUID], for: service)
             }
         }
     }
@@ -87,30 +86,15 @@ extension BluetoothService: CBPeripheralDelegate {
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
-        if characteristic.uuid == loraxTxCharacteristicUUID {
+        if characteristic.uuid == loraxCharacteristicUUID {
             guard let data = characteristic.value else {
                 print("No data received for \(characteristic.uuid.uuidString)")
                 return
             }
             
-            print("Received message: ", (String(data: data, encoding: .utf8) ?? "unknown string"))
-            didReceiveMessage(data: data)
-        }
-    }
-    
-    func didReceiveMessage(data: Data) {
-        let receivedMessage = String(data: data, encoding: .utf8)!
-        viewModel!.updateReceivedMessage(newMessage: receivedMessage)
             
-    }
-}
-
-// ViewModel to hold the text to be displayed
-class BluetoothViewModel: ObservableObject {
-    @Published var receivedMessage: String = ""
-    
-    // Function to update the received text
-    func updateReceivedMessage(newMessage: String) {
-        receivedMessage = newMessage
+            message = String(data: data, encoding: .utf8) ?? "unknown string"
+            loraxPeripheral!.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withoutResponse)
+        }
     }
 }

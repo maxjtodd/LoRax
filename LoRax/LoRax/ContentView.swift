@@ -53,8 +53,6 @@ struct ChatView: View {
 
 struct AdvancedView: View {
     @State private var showBluetoothMessages = false
-    @StateObject private var bluetoothViewModel = BluetoothViewModel()
-    @StateObject private var bluetoothService = BluetoothService()
     
     var body: some View {
         VStack {
@@ -71,8 +69,6 @@ struct AdvancedView: View {
             Spacer()
             if showBluetoothMessages {
                 BluetoothMessagesView()
-                    .environmentObject(bluetoothViewModel)
-                    .environmentObject(bluetoothService)
             }
             Spacer()
         }
@@ -81,12 +77,11 @@ struct AdvancedView: View {
 
 
 struct BluetoothMessagesView: View {
-    @EnvironmentObject var bluetoothViewModel: BluetoothViewModel
-    @EnvironmentObject var bluetoothService: BluetoothService
-    
+    @StateObject var service = BluetoothService()
+
     var body: some View {
         VStack {
-            Text("Received Text: \(bluetoothViewModel.receivedMessage)")
+            Text("Received Text: \(service.message)")
             .padding()
         
         }
