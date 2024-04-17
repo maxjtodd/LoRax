@@ -61,56 +61,62 @@ struct ContactView: View {
             if (!addingContact && !modifyingContact) {
                 
                 List {
+                    Section(header: Text("Recents")) {
+                        lastMessageView(macs: self.getLastMessagesContacts())
+                    }
                     
-                    // Display Contacts
-                    ForEach(self.contacts) { c in
-                        ContactListSlot(contact: c)
+                    Section(header: Text("Contacts")) {
                         
-                        // On Swipe Actions
-                            .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
-                                
-                                // Delete Contact
-                                Button(role: .destructive) {
-                                    deletingContact = true
-                                    deletingMac = c.mac!
-                                    deletingFName = c.fName!
-                                    deletingLName = c.lName!
-                                    self.deleteContact(contact: c)
-                                } label: {
-                                    Label("Delete Contact", systemImage: "trash")
+                        // Display Contacts
+                        ForEach(self.contacts) { c in
+                            ContactListSlot(contact: c)
+                            
+                            // On Swipe Actions
+                                .swipeActions(edge: /*@START_MENU_TOKEN@*/.trailing/*@END_MENU_TOKEN@*/) {
+                                    
+                                    // Delete Contact
+                                    Button(role: .destructive) {
+                                        deletingContact = true
+                                        deletingMac = c.mac!
+                                        deletingFName = c.fName!
+                                        deletingLName = c.lName!
+                                        self.deleteContact(contact: c)
+                                    } label: {
+                                        Label("Delete Contact", systemImage: "trash")
+                                    }
+                                    .tint(.red)
+                                    
+                                    
+                                    // Modify Contact
+                                    Button() {
+                                        fName = c.fName!
+                                        lName = c.lName!
+                                        mac = c.mac!
+                                        modifyingContact = true
+                                    } label: {
+                                        Label("Modify Contact", systemImage: "gear")
+                                    }
+                                    .tint(.orange)
                                 }
-                                .tint(.red)
-                                
-                                
-                                // Modify Contact
-                                Button() {
-                                    fName = c.fName!
-                                    lName = c.lName!
-                                    mac = c.mac!
-                                    modifyingContact = true
-                                } label: {
-                                    Label("Modify Contact", systemImage: "gear")
+                            
+                            // Confirm message deletion
+                                .confirmationDialog(
+                                    Text("Delete contact data?"),
+                                    isPresented: $deletingContact,
+                                    titleVisibility: .visible
+                                ) {
+                                    Button("Delete All Chat History", role: .destructive) {
+                                        deleteMessagesFromMac(mac: deletingMac)
+                                    }
+                                    Button("Cancel data deletion", role: .destructive) {
+                                        _ = createNonContact(mac: deletingMac)
+                                    }
+                                    Button("Cancel", role: .cancel) {
+                                        _ = addContact(fName: deletingFName, lName: deletingLName, mac: deletingMac)
+                                    }
                                 }
-                                .tint(.orange)
-                            }
-                        
-                        // Confirm message deletion
-                            .confirmationDialog(
-                                Text("Delete contact data?"),
-                                isPresented: $deletingContact,
-                                titleVisibility: .visible
-                            ) {
-                                Button("Delete All Chat History", role: .destructive) {
-                                    deleteMessagesFromMac(mac: deletingMac)
-                                }
-                                Button("Cancel data deletion", role: .destructive) {
-                                    _ = createNonContact(mac: deletingMac)
-                                }
-                                Button("Cancel", role: .cancel) {
-                                    _ = addContact(fName: deletingFName, lName: deletingLName, mac: deletingMac)
-                                }
-                            }
-                        
+                            
+                        }
                     }
                     
                     // Display Non Contacts
@@ -161,15 +167,16 @@ struct ContactView: View {
                 // Toolbar
                 .navigationTitle("Contacts")
                 .toolbar {
-//                    ToolbarItemGroup(placement: .topBarLeading) {
-//                        Spacer()
-//                        Button("", systemImage: "minus") {
-//                            let v = validateMac(mac: "00:1A:2B:3C:4D:5E")
-//                            print(v)
-//                        }
-//                        Spacer()
-//                        
-//                    }
+                    ToolbarItemGroup(placement: .topBarLeading) {
+                        Spacer()
+                        Button("", systemImage: "minus") {
+                            print("TEST")
+                            let v = getLastMessagesContacts()
+                            print(v)
+                        }
+                        Spacer()
+                        
+                    }
                     
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Spacer()
@@ -311,6 +318,33 @@ struct ContactView: View {
         let macRegex = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
         let macTest = NSPredicate(format: "SELF MATCHES %@", macRegex)
         return macTest.evaluate(with: mac)
+    }
+    
+    
+    /// Get the contact in core data for the given mac address
+    /// - Parameter mac: Mac of the contact to be searched for
+    /// - Returns: Contact, optionally nil if the contact doesn't exist in core data
+    private func getContactFromMac(mac: String) -> Contact? {
+        
+        // Set up request to get contact
+        let request: NSFetchRequest<Contact> = Contact.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+        
+        // Send fetch request to see if mac exists
+        do {
+            
+            // Fetch request didn't error: return contact or nil
+            let c = try viewContext.fetch(request).first
+            return c
+            
+        }
+        // Error, return nil
+        catch {
+            print("Error adding contact - couldn't fetch")
+            return nil
+        }
+        
     }
     
     
@@ -584,6 +618,57 @@ struct ContactView: View {
         }
     }
     
+    
+    /// Get the 5 latest message senders/recievers
+    /// - Returns: String array of the mac addresses of the last communicated with devices
+    private func getLastMessagesContacts() -> [String] {
+        
+        // Get the last 5 messages from unique senders sent with core data. Only get last 50,
+        //  if there is any more after that only display less contacts.
+        let request: NSFetchRequest<Message> = Message.fetchRequest()
+        request.fetchLimit = 50
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Message.date, ascending: false)]
+        
+        // Try to get the messages
+        do {
+            let messages = try viewContext.fetch(request)
+            if messages.count == 0 {
+                return []
+            }
+            
+            // Get the latest messages with unique contacts
+            var contacts: [String] = []
+            for m in messages {
+                
+                // Get the contact, add to contacts if unique
+                let c = m.mac
+                var found = false
+                contacts.indices.forEach { i in
+                    if contacts[i] == c! {
+                        found = true
+                    }
+                }
+                
+                if !found {
+                    contacts.append(c!)
+                }
+                
+                // We have all of the contacts we want
+                if contacts.count == 5 {
+                    break
+                }
+            }
+            
+            // Return all of the MAC addresses of the latest messages sent
+            return contacts
+            
+        }
+        // Error occured fetching messages
+        catch {
+            print("Latest Message Get Error")
+            return []
+        }
+    }
 }
 
 
@@ -630,6 +715,82 @@ struct nonContactListSlot: View {
     }
 }
 
+
+struct lastMessageView: View {
+    
+    // Stores the macs of the latest messages
+    @Environment(\.managedObjectContext) private var viewContext
+    var macs: [String]
+    
+    var body: some View {
+        if macs.count == 0 {
+            HStack {}
+        }
+        else {
+            ForEach(macs, id: \.self) { m in
+                
+                let c = getContactFromMac(mac: m)
+                // mac is not a contact, show a non contact link
+                if c == nil {
+                    let nc = getNonContactFromMac(mac: m)
+                    nonContactListSlot(nonContact: nc!)
+                }
+                // mac is a contact, show a contact link
+                else {
+                    ContactListSlot(contact: c!)
+                }
+            }
+        }
+    }
+    
+    private func getContactFromMac(mac: String) -> Contact? {
+        
+        // Set up request to get contact
+        let request: NSFetchRequest<Contact> = Contact.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+        
+        // Send fetch request to see if mac exists
+        do {
+            
+            // Fetch request didn't error: return contact or nil
+            let c = try viewContext.fetch(request).first
+            return c
+            
+        }
+        // Error, return nil
+        catch {
+            print("Error adding contact - couldn't fetch")
+            return nil
+        }
+        
+    }
+    
+    private func getNonContactFromMac(mac: String) -> NonContact? {
+        
+        // Set up request to get contact
+        let request: NSFetchRequest<NonContact> = NonContact.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "mac LIKE %@", mac)
+        
+        // Send fetch request to see if mac exists
+        do {
+            
+            // Fetch request didn't error: return contact or nil
+            let c = try viewContext.fetch(request).first
+            return c
+            
+        }
+        // Error, return nil
+        catch {
+            print("Error adding contact - couldn't fetch")
+            return nil
+        }
+        
+    }
+    
+    
+}
 
 @available(iOS 16.0, *)
 struct ContactView_Previews: PreviewProvider {
