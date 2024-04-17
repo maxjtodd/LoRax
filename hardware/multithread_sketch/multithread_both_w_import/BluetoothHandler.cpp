@@ -4,6 +4,7 @@
 #include <BLE2902.h>
 //#include <Heltec.h> // Assuming this is where Heltec related code resides
 #include "heltec.h"
+#include <esp_system.h>
 
 #include "shared_data.h"
 
@@ -13,6 +14,10 @@
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 char data[50];
+
+// mac addr of esp32
+uint8_t baseMac[6];
+
 
 BLECharacteristic* characteristic = NULL;
 
@@ -47,6 +52,20 @@ void MyServerCallbacks::onDisconnect(BLEServer* pServer) {
     pServer->startAdvertising();
 }
 
+esp_err_t getMacAddress() {
+    esp_err_t err = esp_read_mac(baseMac, ESP_MAC_BT);
+    if (err != ESP_OK) {
+        printf("Failed to read MAC address. Error code: %d\n", err);
+        return err;
+    }
+
+    printf("MAC Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
+           baseMac[0], baseMac[1], baseMac[2],
+           baseMac[3], baseMac[4], baseMac[5]);
+
+    return ESP_OK;
+}
+
 void Bluetoothcode(void* pvParameters) {
 
     Serial.print("Task0 running on core ");
@@ -74,6 +93,8 @@ void Bluetoothcode(void* pvParameters) {
     BLEDevice::startAdvertising();
     
     Serial.println("BLE server is ready, waiting for connections...");
+
+    getMacAddress();
 
     for (;;) { // infinite loop
         //Serial.println("  Core 0 processing - Bluetooth");
@@ -111,8 +132,10 @@ void Bluetoothcode(void* pvParameters) {
             oldDeviceConnected = deviceConnected;
         }
 
-        if (messageDataQueue_toLora.queue.size() >= 1) {
-            Serial.println("    BT - MESSAGE TO BE SENT TO LORA");
-        }
+
+        // check for message to send to LoRa core
+        // 1. build packet
+        //      
+        // 2. add packet to messageDataQueue_toLora
     }
 }
