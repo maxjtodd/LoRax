@@ -92,9 +92,12 @@ extension BluetoothService: CBPeripheralDelegate {
                 return
             }
             
-            
             message = String(data: data, encoding: .utf8) ?? "unknown string"
-            loraxPeripheral!.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withoutResponse)
+            
+            let outgoingMessage = message + " to you too!"
+            let outgoingData = Data(outgoingMessage.utf8)
+            
+            loraxPeripheral!.writeValue(outgoingData, for: characteristic, type: CBCharacteristicWriteType.withResponse)
         }
     }
 }
