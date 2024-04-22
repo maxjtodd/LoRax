@@ -66,6 +66,15 @@ esp_err_t getMacAddress() {
     return ESP_OK;
 }
 
+char* buildStringFromPacket(messageData& newMessage) {
+
+    char* result;
+    sprintf(result, "%d;%s;%s;%d;%s", newMessage.message_type, newMessage.message_id, newMessage.message_dest, newMessage.size, newMessage.value);
+    return result;
+}
+
+bool send = true;
+
 void Bluetoothcode(void* pvParameters) {
 
     Serial.print("Task0 running on core ");
@@ -97,8 +106,15 @@ void Bluetoothcode(void* pvParameters) {
     getMacAddress();
 
     for (;;) { // infinite loop
+
         //Serial.println("  Core 0 processing - Bluetooth");
-        delay(500);
+        delay(10000);
+
+            // Serial.println("Building test 1");
+
+            // messageData newMessage = {1, "MAC1", "MAC2", 0, "this is a message"};
+            // if (send) {pushMessageData(messageDataQueue_toLora, newMessage);}
+            // send = false;
 
         // IF MESSAGE RECEIVED FROM iOS - to send over lora 
         // data.sensorId = 1;
@@ -115,10 +131,17 @@ void Bluetoothcode(void* pvParameters) {
         if (messageDataQueue_toBT.queue.size() >= 1 && deviceConnected) {
             Serial.println("    BT - MESSAGE TO BE SENT TO iOS");
 
-            characteristic->setValue(data);
+            // get new message to be sent 
+            messageData newMessage = getMessageData(messageDataQueue_toBT);
+
+            // unpack to string
+            char* toIOS = buildStringFromPacket(newMessage);
+
+            // set characteristic to new message    
+            characteristic->setValue(toIOS);
             characteristic->notify();
             Serial.print("  Message broadcast on BLE - ");
-            Serial.println(data);
+            Serial.println(toIOS);
         }
         // no device connected, but old device connected
         else if (!deviceConnected && oldDeviceConnected) {
