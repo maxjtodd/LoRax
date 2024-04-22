@@ -7,7 +7,23 @@
 
 // Define a data structure
 struct messageData {
-    int id;
+    int message_type; 
+        /* types:
+            new message : 0x01,
+            contact ping: 0x02,
+            ack of mess.: 0x03
+        */
+    char* message_id;
+        /* to ensure unqiueness across devices, a messageID will contain two components
+            1. a message counter, incremeneted everytime a message is sent
+            2. the mac address of the sending device
+            ex. 'MESSAGE_COUNT'_'ESP_MAC' (int) 
+        */
+    char* message_dest;
+        /*
+        When sending message to specific device, we use the MAC addr transfered during 
+        a contact ping
+        */
     int size;
     char* value;
   //  time_t messageSentTime; 
