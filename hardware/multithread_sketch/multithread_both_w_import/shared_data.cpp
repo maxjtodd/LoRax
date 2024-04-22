@@ -15,12 +15,13 @@ messageData getMessageData(messageDataQueue& mdq) {
   std::lock_guard<std::mutex> lock(mdq.mtx); // lock mutex
 
   messageData data = mdq.queue.front();
-  mdq.queue.pop();
+
+  mdq.queue.pop(); // remove message from queue
 
   return data;
 }
 
-void pushMessageData(messageDataQueue mdq, messageData dataToInsert) {
+void pushMessageData(messageDataQueue& mdq, messageData& dataToInsert) {
 
   std::lock_guard<std::mutex> lock(mdq.mtx); // lock mutex
 
