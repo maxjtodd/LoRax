@@ -1,5 +1,6 @@
 #include "shared_data.h"
 #include <mutex>
+#include <string.h>
 
 
 
@@ -7,8 +8,8 @@
 messageDataQueue messageDataQueue_toLora;
 messageDataQueue messageDataQueue_toBT;
 
-// global ack_LL
-ack_LL *ack_list = new ack_LL;
+// global LL
+LL *ack_list = new LL;
 
 messageData getMessageData(messageDataQueue& mdq) {
   /*
@@ -34,20 +35,20 @@ void pushMessageData(messageDataQueue& mdq, messageData& dataToInsert) {
 }
 
 // Initialization functions
-ack_Node::ack_Node(char* id) : messageID(id), next(nullptr) {}
-ack_LL::ack_LL() : head(nullptr) {}
+Node::Node(char* id) : messageID(id), next(nullptr) {}
+LL::LL() : head(nullptr) {}
 
 // Insert new node into the ack linked list
-void ack_LL::insert(char* id) {
-  ack_Node* newNode = new ack_Node(id);
+void LL::insert(char* id) {
+  Node* newNode = new Node(id);
   newNode->next = head;
   head = newNode;
 }
 
 // remove node from ack linked list given an attribute
-void ack_LL::remove(char* id) {
-  ack_Node* curr = head;
-  ack_Node* prev = nullptr;
+void LL::remove(char* id) {
+  Node* curr = head;
+  Node* prev = nullptr;
 
   // traverse list, find node to remove
   while (curr != nullptr && curr->messageID != id) {
@@ -67,4 +68,18 @@ void ack_LL::remove(char* id) {
 
       delete curr;
   }
+}
+
+// check if node exists in list
+bool LL::contains(char* id) {
+
+  Node* curr = head;
+
+  while(curr != nullptr) {
+    if (strcmp(curr->messageID, id) == 0) {return true;}
+    curr = curr->next;
+  }
+
+  return false;
+
 }

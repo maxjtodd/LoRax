@@ -45,19 +45,20 @@ extern messageDataQueue messageDataQueue_toBT;
 messageData getMessageData(messageDataQueue& mdq);
 void pushMessageData(messageDataQueue& mdq,  messageData& data);
 
-struct ack_Node {
+struct Node {
     char* messageID;
-    ack_Node* next;
+    Node* next;
 
-    ack_Node(char* id);
+    Node(char* id);
 };
 
-class ack_LL {
-    private: ack_Node* head;
+class LL {
+    private: Node* head;
     public: 
-        ack_LL();
+        LL();
         void insert(char* id);
         void remove (char* id);
+        bool contains(char* id);
 };
 
 #endif
