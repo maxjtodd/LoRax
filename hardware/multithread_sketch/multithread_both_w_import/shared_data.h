@@ -5,7 +5,7 @@
 #include <ctime>
 #include <mutex>
 
-// Define a data structure
+// messageData - functions as the data packet
 struct messageData {
     int message_type; 
         /* types:
@@ -45,5 +45,19 @@ extern messageDataQueue messageDataQueue_toBT;
 messageData getMessageData(messageDataQueue& mdq);
 void pushMessageData(messageDataQueue& mdq,  messageData& data);
 
+struct ack_Node {
+    char* messageID;
+    ack_Node* next;
+
+    ack_Node(char* id);
+};
+
+class ack_LL {
+    private: ack_Node* head;
+    public: 
+        ack_LL();
+        void insert(char* id);
+        void remove (char* id);
+};
 
 #endif
