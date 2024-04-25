@@ -6,8 +6,11 @@
 #include <iostream>
 #include "HT_SSD1306Wire.h"
 #include "Arduino.h"
+
 #include "LoRa.h"
+
 #include "shared_data.h"
+#include "AES.h"  
 
 static RadioEvents_t RadioEvents;
 
@@ -23,6 +26,12 @@ static RadioEvents_t RadioEvents;
 
 #define RX_TIMEOUT_VALUE                            1000
 #define BUFFER_SIZE                                 30 // Define the payload size here
+
+// Constants for the key exchange protocol
+#define PRIME_MODULUS       32749 // A prime number smaller than 32767
+#define BASE_GENERATOR      5
+
+#define DEBUG                                       1
 
 char txpacket[BUFFER_SIZE];
 char serial[100];
@@ -40,7 +49,21 @@ int16_t txNumber=0;
 int16_t pingCount = 0;
 int16_t sendMessageCount = 0;
 int16_t rssi, rxSize;
+
+uint8_t key[16];
+uint8_t iv[16];
+
 bool lora_idle=true;
+bool sharedKey=false;
+
+int private_key;
+int public_key;
+
+int paddedLen = 0;
+byte *decryptedMessage = NULL;
+byte *paddedMessage = NULL;
+
+AES aes;
 
 // Need a third type of message - ACK's
 // everytime we send a message out, we pop the message from original queue, add to ack_wait_list
@@ -55,6 +78,71 @@ const int ident_ack = 0x03;
 // global instance of messageData - contactPing
 messageData contactPing = {ESP.getEfuseMac(), NULL, NULL};
 
+void generate_random_iv(uint8_t iv[]) {
+  for (size_t i = 0; i < 16; i++) {
+    iv[i] = rand() % 256; // Generates a random number between 0 and 255
+  }
+}
+
+// Function to perform modular exponentiation
+int modExp(int base, int exponent, int modulus) {
+  int result = 1;
+  base = base % modulus; // Ensure base is within the range of modulus
+
+  // Iterate through the bits of the exponent
+  while (exponent > 0) {
+    // Check if the least significant bit of the exponent is set (odd)
+    if (exponent & 1) {
+      // Multiply result by base and take modulus with respect to modulus
+      result = (result * base) % modulus;
+    }
+
+    // Right-shift the exponent by 1 bit to process the next bit
+    exponent = exponent >> 1;
+
+    // Square the base and take modulus with respect to modulus
+    base = (base * base) % modulus;
+  }
+
+  return result; // Return the final result after iterating through all bits of the exponent
+}
+
+void performKeyExchange() {
+  // Generate private key
+  private_key = random(1, PRIME_MODULUS);
+  Serial.print("Private Key: ");
+  Serial.println(private_key);
+
+  // Calculate public key
+  public_key = modExp(BASE_GENERATOR, private_key, PRIME_MODULUS);
+  Serial.print("Public Key: ");
+  Serial.println(public_key);
+  while (!sharedKey) {
+    // Send public key to the other device
+    sprintf(txpacket, "%d", public_key);
+    Radio.Send((uint8_t *)txpacket, strlen(txpacket));
+    Radio.IrqProcess();
+
+    // Receive public key from the other device
+    delay(100); // Wait for the other device to send its public key
+    Radio.Rx(0);
+    Radio.IrqProcess();
+  }
+}
+
+void deriveEncryptionKey(int received_public_key) {
+    // Derive shared secret using modular exponentiation
+    int shared_secret = modExp(received_public_key, private_key, PRIME_MODULUS);
+
+    // Convert shared_secret to a byte array (encryption key)
+    for (int i = 0; i < 16; i++) {
+        // Extract each byte of the shared secret and store it in the encryption key array
+        // Shift the bits of shared_secret to the right by (8 * i) to extract each byte
+        // Then, mask out the least significant byte (8 bits) using bitwise AND with 0xFF
+        // Finally, cast the result to a byte type and store it in the encryption key array
+        key[i] = (byte)(shared_secret >> (8 * i) & 0xFF);
+    }
+}
 
 messageData processMessageString(char* message) {
   /*
@@ -132,6 +220,8 @@ void SendReceivecode(void* vpParameters) {
 
   delay(2000); // delay 2s to allow for BLE setup
 
+  performKeyExchange();
+
   for (;;) {
     //Serial.println("  Core 1 processing - send/receive");
 
@@ -166,19 +256,39 @@ void SendReceivecode(void* vpParameters) {
 
         // increment send count
         sendMessageCount++;
-
+        byte *paddedTxPacket;
         // pop message packet from waiting queue
         messageData data_to_send = getMessageData(messageDataQueue_toLora);
-
 
         // packet prinout
         Serial.printf("PACKET FROM BT : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
         sprintf(txpacket, "%d;%s;%s;%d;%s", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
         Serial.printf(txpacket);
 
+        // Encrypt packet
+            paddedLen = aes.get_padded_len(strlen(txpacket));
+            byte *paddedMessage = (byte *)malloc(paddedLen);
+            if (paddedMessage == NULL) {
+                Serial.println("Memory allocation failed");
+                return;
+            }
+            memset(paddedMessage, 0, paddedLen); // Initialize with 0
+            memcpy(paddedMessage, txpacket, strlen(txpacket)); // Copy the message
+            byte *paddedMessagePtr = paddedMessage; // Store the pointer to pass it to the padPlaintext function
+            aes.padPlaintext((const void*)paddedMessagePtr, paddedMessage); // Corrected argument
+            paddedTxPacket = (byte *)malloc(paddedLen);
+            if (paddedTxPacket == NULL) {
+                Serial.println("Memory allocation failed");
+                free(paddedMessage); // Free allocated memory
+                return;
+            }
+            aes.cbc_encrypt(paddedMessage, paddedTxPacket, paddedLen / 16, iv);
+            free(paddedMessage); // Free allocated memory
+
+
         Serial.println("\nSending...");
         // send the packet out
-        Radio.Send( (uint8_t *)txpacket, strlen(txpacket) ); 
+        Radio.Send( paddedTxPacket, paddedLen ); 
         Radio.IrqProcess( );
         Serial.println("Sent.");
 
@@ -217,79 +327,98 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr ) {
     memcpy(rxpacket, payload, size ); // copy message 
     rxpacket[size]='\0';              // terminating char
     Radio.Sleep( );                   
+    
+    if(!sharedKey) {
+      
+      // If shared key is not yet established, received payload is assumed to be the public key
+      int received_public_key = atoi((char*)payload); // Convert payload to integer
+      
+      // Derive encryption key from received public key
+      deriveEncryptionKey(received_public_key);
 
-    // build serial monitor printout
-    char result[100];                             
-    sprintf(result,"\r\nreceived packet \"%s\", length %d\r\n",rxpacket,rxSize);
-    Serial.printf(result);
+      // Set sharedKey to true to indicate that key exchange is completed
+      sharedKey = true;
+      if (DEBUG) {
+        //Serial.println("I am here");
+        Serial.println(received_public_key);
+        
+      }
+    }
 
-    // THREE OPTIONS ON MESSAGE RECEIVE 
+    else{
+      // build serial monitor printout
+      char result[100];                             
+      sprintf(result,"\r\nreceived packet \"%s\", length %d\r\n",rxpacket,rxSize);
+      Serial.printf(result);
+
+      // THREE OPTIONS ON MESSAGE RECEIVE 
         //  - Contact Ping - append to BT list w contantPing Designation
         //  - Message      - append to BT list w Message Designation
         //  - Ack of previous message send - pop associated message from LoRa queue
     
-    /* PCKAET STRUCTURE
+      /* PCKAET STRUCTURE
 
           delim = ;
 
-      TYPE;MESSAGENUM_MACADDR;DEST_MACADDR;message_contant;
+        TYPE;MESSAGENUM_MACADDR;DEST_MACADDR;message_contant;
 
-    */
+      */
 
-    messageData newMessage = processMessageString(result);
-    Serial.printf(" New Message from LoRa:\n    Type:%d\n   ID:%d\n   Content:%d", newMessage.message_type, newMessage.message_id, newMessage.value);
+      messageData newMessage = processMessageString(result);
+      Serial.printf(" New Message from LoRa:\n    Type:%d\n   ID:%d\n   Content:%d", newMessage.message_type, newMessage.message_id, newMessage.value);
 
 
-    // Determine Packet type
+      // Determine Packet type
 
-    // contact ping
-    if (newMessage.message_type == 0) {
+      // contact ping
+      if (newMessage.message_type == 0) {
 
-      // Send contact device MAC ADDR to iOS app, determine if seen before
-      Serial.println("Type is Contant Ping - push to BT Queue");
+        // Send contact device MAC ADDR to iOS app, determine if seen before
+        Serial.println("Type is Contant Ping - push to BT Queue");
 
-      pushMessageData(messageDataQueue_toBT, newMessage);
+        pushMessageData(messageDataQueue_toBT, newMessage);
 
       
 
-    }
+      }
 
-    // new message
-    else if (newMessage.message_type == 1) {
+      // new message
+      else if (newMessage.message_type == 1) {
 
-      Serial.println("Type is Message - push to BT Queue");
+        Serial.println("Type is Message - push to BT Queue");
       
-      pushMessageData(messageDataQueue_toBT, newMessage);
+        pushMessageData(messageDataQueue_toBT, newMessage);
 
-      // build, send ack
-      messageData ack = {2, newMessage.message_id, 0, 0, 0};
-      pushMessageData(messageDataQueue_toLora, ack);
+        // build, send ack
+        messageData ack = {2, newMessage.message_id, 0, 0, 0};
+        pushMessageData(messageDataQueue_toLora, ack);
 
-    }
+      }
 
-    // ack from previous sent message
-    else {
-      Serial.println("Type is ACK");
+      // ack from previous sent message
+      else {
+        Serial.println("Type is ACK");
 
-      // // check ack list n
-      // int size = sizeof(sentMessageIDs) / sizeof(sentMessageIDs[0]);
-      // for (int i = 0; i < size; i++) {
+        // // check ack list n
+        // int size = sizeof(sentMessageIDs) / sizeof(sentMessageIDs[0]);
+        // for (int i = 0; i < size; i++) {
         
-      //   // if ack matches previously sent ID
-      //   if strcmp(newMessage.message_ID, sentMessageIDs[i] == 0) {
+        //   // if ack matches previously sent ID
+        //   if strcmp(newMessage.message_ID, sentMessageIDs[i] == 0) {
           
-      //     // send ack info to iOS
+        //     // send ack info to iOS
 
 
-      //   }
+        //   }
 
-      // }
+        // }
 
-      pushMessageData(messageDataQueue_toBT, newMessage);
+        pushMessageData(messageDataQueue_toBT, newMessage);
 
+      }
+
+      state = STATE_TX;
     }
-
-    state = STATE_TX;
 }
 
 
