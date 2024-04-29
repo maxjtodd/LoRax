@@ -61,9 +61,9 @@ struct ContactView: View {
             if (!addingContact && !modifyingContact) {
                 
                 List {
-                    Section(header: Text("Recents")) {
-                        lastMessageView(macs: self.getLastMessagesContacts())
-                    }
+//                    Section(header: Text("Recents")) {
+//                        lastMessageView(macs: self.getLastMessagesContacts())
+//                    }
                     
                     Section(header: Text("Contacts")) {
                         
@@ -167,16 +167,16 @@ struct ContactView: View {
                 // Toolbar
                 .navigationTitle("Contacts")
                 .toolbar {
-                    ToolbarItemGroup(placement: .topBarLeading) {
-                        Spacer()
-                        Button("", systemImage: "minus") {
-                            print("TEST")
-                            let v = getLastMessagesContacts()
-                            print(v)
-                        }
-                        Spacer()
-                        
-                    }
+//                    ToolbarItemGroup(placement: .topBarLeading) {
+//                        Spacer()
+//                        Button("", systemImage: "minus") {
+//                            print("TEST")
+//                            let v = getLastMessagesContacts()
+//                            print(v)
+//                        }
+//                        Spacer()
+//                        
+//                    }
                     
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Spacer()

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FFA0346C2B9685B40009CC76 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA0346B2B9685B40009CC76 /* MessageView.swift */; };
+		FFAD29F12BE02ED5006EFCED /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAD29F02BE02ED5006EFCED /* ChatView.swift */; };
 		FFC941122BAE1D2F0001073F /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC941112BAE1D2F0001073F /* ContactView.swift */; };
 		FFD6C1242BAE174300C4ED54 /* LoRax.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FFD6C1222BAE174300C4ED54 /* LoRax.xcdatamodeld */; };
 		FFD6C1262BAE193000C4ED54 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD6C1252BAE193000C4ED54 /* Persistence.swift */; };
@@ -40,6 +41,7 @@
 /* Begin PBXFileReference section */
 		B59E4A452BB2574100CDF864 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		FFA0346B2B9685B40009CC76 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
+		FFAD29F02BE02ED5006EFCED /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		FFC941112BAE1D2F0001073F /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
 		FFD6C1232BAE174300C4ED54 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		FFD6C1252BAE193000C4ED54 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				FFD6C1252BAE193000C4ED54 /* Persistence.swift */,
 				FFFA94972B8D468700CE14F8 /* ContentView.swift */,
 				FFC941112BAE1D2F0001073F /* ContactView.swift */,
+				FFAD29F02BE02ED5006EFCED /* ChatView.swift */,
 				FFA0346B2B9685B40009CC76 /* MessageView.swift */,
 				FFD6C1222BAE174300C4ED54 /* LoRax.xcdatamodeld */,
 				FFFA94992B8D468B00CE14F8 /* Assets.xcassets */,
@@ -272,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFA0346C2B9685B40009CC76 /* MessageView.swift in Sources */,
+				FFAD29F12BE02ED5006EFCED /* ChatView.swift in Sources */,
 				FFC941122BAE1D2F0001073F /* ContactView.swift in Sources */,
 				FFD6C1242BAE174300C4ED54 /* LoRax.xcdatamodeld in Sources */,
 				FFD6C1262BAE193000C4ED54 /* Persistence.swift in Sources */,
