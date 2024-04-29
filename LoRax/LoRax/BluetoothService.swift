@@ -18,7 +18,7 @@ enum ConnectionStatus {
 
 let loraxServiceUUID = CBUUID(string: "B99CFDBD-4F69-42AA-82DA-68B92D310DEA")
 let loraxCharacteristicUUID = CBUUID(string: "0F146B5F-2B7E-46A0-B246-36ED1867F6E7")
-//let loraxRxCharacteristicUUID = CBUUID(string: "B54E3121-477C-4A86-9FE7-19292CFA415B")
+let loraxRxCharacteristicUUID = CBUUID(string: "B54E3121-477C-4A86-9FE7-19292CFA415B")
 
 class BluetoothService: NSObject, ObservableObject {
     var centralManager: CBCentralManager!
@@ -74,14 +74,21 @@ extension BluetoothService: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
         for service in peripheral.services ?? [] {
             if service.uuid == loraxServiceUUID {
-                peripheral.discoverCharacteristics([loraxCharacteristicUUID], for: service)
+                peripheral.discoverCharacteristics([loraxCharacteristicUUID, loraxRxCharacteristicUUID], for: service)
             }
         }
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
         for characteristic in service.characteristics ?? [] {
-            peripheral.setNotifyValue(true, for: characteristic)
+            if characteristic.uuid == loraxRxCharacteristicUUID {
+                let outgoingMessage = "Message from phone"
+                let outgoingData = Data(outgoingMessage.utf8)
+                peripheral.writeValue(outgoingData, for: characteristic, type: .withResponse)
+            } else if characteristic.uuid == loraxCharacteristicUUID {
+                // Subscribe to notifications for RX characteristic
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
         }
     }
     
@@ -94,10 +101,6 @@ extension BluetoothService: CBPeripheralDelegate {
             
             message = String(data: data, encoding: .utf8) ?? "unknown string"
             
-            let outgoingMessage = message + " to you too!"
-            let outgoingData = Data(outgoingMessage.utf8)
-            
-            loraxPeripheral!.writeValue(outgoingData, for: characteristic, type: CBCharacteristicWriteType.withResponse)
         }
     }
 }
