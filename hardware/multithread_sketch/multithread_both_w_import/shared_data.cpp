@@ -8,9 +8,6 @@
 messageDataQueue messageDataQueue_toLora;
 messageDataQueue messageDataQueue_toBT;
 
-// global LL
-LL *ack_list = new LL;
-
 messageData getMessageData(messageDataQueue& mdq) {
   /*
     Retreive first messageData from queue
