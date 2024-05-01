@@ -43,13 +43,12 @@ int16_t rssi, rxSize;
 bool lora_idle=true;
 
 
-const int ident_message = 0x01;
-const int ident_contact = 0x02;
-const int ident_ack = 0x03;
-
 // forward declarations
 void sendContactPing();
 void sendMessageFromiOS(); 
+messageData processMessageString(char * message);
+
+
 
 // global instance - contanct ping linked list
 LL* knownContacts = new LL;
@@ -61,54 +60,23 @@ LL* sentMessageIDs = new LL;
 // global instance of messageData - contactPing
 messageData contactPing = {ESP.getEfuseMac(), NULL, NULL};
 
+char* get_mac_address_static() {
+    static char mac_addr[18];  // Static buffer to hold the MAC address
+    uint8_t baseMac[6];
 
-messageData processMessageString(char* message) {
-  /*
-  Params : (char*) message
-  
-    Process a message (char*)
-    Return a new messageData object.
-    Attributes assigned to those passed in message
+    if (esp_read_mac(baseMac, ESP_MAC_BT) == ESP_OK) {
+        sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", 
+                baseMac[0], baseMac[1], baseMac[2], 
+                baseMac[3], baseMac[4], baseMac[5]);
+        return mac_addr;
+    } else {
+        return NULL;  // Return NULL if the MAC address could not be read
+    }
+}
 
-    MESSAGE FORMAT:
 
-      TYPE;ID:CONTENT;
-  
-  */
-
-  int type_token;
-  char* id_token;
-  char* message_token;
-  char* dest_token;
-
-  std::string delimiter = ";";
-  std::string s = message;
-
-  size_t pos = 0;
-  int count = 0;
-  std::string token;
-  // iterate thru string, separate by ';', assign each token
-  while ((pos = s.find(delimiter)) != std::string::npos) {
-      token = s.substr(0, pos);
-      char* token_char = new char[token.length()+1];
-      strcpy(token_char, token.c_str());
-      //Serial.printf("   TOKEN: %s\n", token_char);
-      s.erase(0, pos + delimiter.length());
-      
-      if (count == 0) { type_token = strtol(token_char, &id_token, 10); }
-      else if (count == 1) { id_token = token_char; }
-      else if (count == 2) { dest_token = token_char; }
-      else { message_token = token_char; }
-      count++;
-  }
-
-  messageData newMessage = {type_token, id_token, dest_token, 0, message_token };
-
-  return newMessage;
-} // processMessageString
 
 void SendReceivecode(void* vpParameters) {
-
 
   // display.init();
   // display.setFont(ArialMT_Plain_10);
@@ -145,49 +113,56 @@ void SendReceivecode(void* vpParameters) {
   /*                             */
 
   for (;;) {
-    //Serial.println("  Core 1 processing - send/receive");
 
+    // CHECK FOR NEW MESSAGE FROM BT_CORE 
     if (messageDataQueue_toLora.queue.size() >= 1) {
       state=STATE_TX; // new message received from bluetooth
     }
+
 
     // else if - 
     // we have a message that has not been ack'ed
     // if so, we send one more time, then swith to RECEIVE to listen for ACK
 
-
+    
+  /*                             */
+  /*        CONTROL SWITCH       */
+  /*                             */
     switch (state) {
+
+
 
       // CASE - send contact ping
       case STATE_TX_CONTACT:
       {
         Serial.println("Building Contact Ping");
   
-        sendContactPing();
+        sendContactPing(); // call send contact ping
       
-        delay(3000); // delay 3s 
+        delay(1000); // delay 3s 
 
-        state = STATE_RX;
-
+        state = STATE_RX; // listen mode 
         break;
       }
+
+
 
       // CASE - message to send from iOS  
       case STATE_TX:
-      { // make explicit
+      { 
+ 
+        sendMessageFromiOS(); // call send message from iOS
 
-        sendMessageFromiOS();
 
-        // // add packet ID to ack llst
-        // size_t size = sizeof(sentMessageIDs);
-        // sentMessageIDs[size] = data_to_send.message_id;
         state = STATE_RX;
-
         break;
       }
 
+
+
       // CASE - listen for incoming messages
       case STATE_RX:
+
         lora_idle = false;
         Serial.println("into RX mode");
         Radio.Rx(0);             // start channel activity detection     
@@ -206,6 +181,47 @@ void SendReceivecode(void* vpParameters) {
 
   }
 
+}
+
+messageData processMessageString(char* message) {
+    /*
+    Params: char* message
+
+    Process a message (char*)
+    Return a new messageData object.
+    Attributes assigned to those passed in message
+
+    MESSAGE FORMAT:
+
+      TYPE;send_ID;recpt_ID;size;CONTENT
+    */
+    
+    const char* delimiter = ";";
+    char* token;
+    int count = 0;
+    
+    messageData newMessage = {0, nullptr, nullptr, 0, nullptr};
+    
+    // Use strtok to split the string by ';'
+    token = strtok(message, delimiter);
+    while (token != nullptr) {
+        if (count == 0) {
+            newMessage.message_type = atoi(token); // Convert first token to integer for type
+        } else if (count == 1) {
+            newMessage.message_id= strdup(token); // Duplicate the sender ID token
+        } else if (count == 2) {
+            newMessage.message_dest = strdup(token); // Duplicate the recipient ID token
+        } else if (count == 3) {
+          newMessage.size = atoi(token);
+        } else if (count == 4) {
+            newMessage.value = strdup(token); // Duplicate the content token
+            break; // No need to process further tokens
+        }
+        count++;
+        token = strtok(nullptr, delimiter); // Continue splitting the string
+    }
+
+    return newMessage;
 }
 
 // From RXDone
@@ -253,12 +269,15 @@ void handleIncomingMessage(messageData newMessage) {
     case 1:
     {
 
-      Serial.println("Type is Message - push to BT Queue\nBuild and send ACK");
+      Serial.println("Type is Message - push to BT Queue");
       
       pushMessageData(messageDataQueue_toBT, newMessage);
 
+      Serial.println("Build and send ACK");
+
       // build ack message
       messageData ack = {2, newMessage.message_id, 0, 0, 0};
+
       // add to queue to be sent
       pushMessageData(messageDataQueue_toLora, ack);
 
@@ -288,10 +307,17 @@ void handleIncomingMessage(messageData newMessage) {
 
 // From Control Switch
 void sendContactPing() {
+
+  char* mac_addr = get_mac_address_static();
+
   // ping printout
   pingCount++;
-  Serial.printf("Sending Ping: %d, %d\n", contactPing.message_id, pingCount);
-  sprintf(txpacket, "0;%d;0;0;0", contactPing.message_id);
+  Serial.printf("Sending Ping: %s, %d\n", mac_addr, pingCount);
+
+  // build send addr
+  
+  
+  sprintf(txpacket, "0;%s;0;0;0", mac_addr);
 
   // send contact ping
   Radio.Send( (uint8_t *)txpacket, strlen(txpacket) );
@@ -310,15 +336,14 @@ void sendMessageFromiOS() {
 
 
   // packet prinout
-  Serial.printf("PACKET FROM BT (to be sent) : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
+  Serial.printf("   PACKET FROM BT (to be sent) : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   sprintf(txpacket, "%d;%s;%s;%d;%s", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   Serial.printf(txpacket);
-  Serial.println("\n...");
 
   if (txpacket != nullptr) {
       Radio.Send((uint8_t*)txpacket, strlen(txpacket));
       Radio.IrqProcess();
-      Serial.println("Sent.");
+      Serial.println("\nSent. (from BT)");
 
       // add packet identifier to sent messages
       Serial.println("Inserting into sent messages");
@@ -341,7 +366,7 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr ) {
     Serial.printf(result);
 
     // build messageData object
-    messageData newMessage = processMessageString(result);
+    messageData newMessage = processMessageString(rxpacket);
     Serial.printf(" New Message from LoRa:\n    Type:%d\n   ID:%d\n   Content:%d\n", newMessage.message_type, newMessage.message_id, newMessage.value);
 
 
