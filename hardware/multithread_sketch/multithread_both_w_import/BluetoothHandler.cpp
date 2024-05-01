@@ -34,6 +34,7 @@ void MyServerCallbacks::onConnect(BLEServer* pServer, esp_ble_gatts_cb_param_t *
         sprintf(addr_str, "%02x:%02x:%02x:%02x:%02x:%02x",
                 param->connect.remote_bda[0], param->connect.remote_bda[1], param->connect.remote_bda[2],
                 param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5]);
+                
         name += " (";
         name += addr_str;
         name += ")";
@@ -110,11 +111,11 @@ void Bluetoothcode(void* pvParameters) {
         //Serial.println("  Core 0 processing - Bluetooth");
         delay(10000);
 
-            // Serial.println("Building test 1");
+            Serial.println("Building test");
 
-            // messageData newMessage = {1, "MAC1", "MAC2", 0, "this is a message"};
-            // if (send) {pushMessageData(messageDataQueue_toLora, newMessage);}
-            // send = false;
+            messageData newMessage = {1, "MAC1", "MAC2", 0, "this is a test message"};
+            if (send) {pushMessageData(messageDataQueue_toLora, newMessage);}
+            //send = false;
 
         // IF MESSAGE RECEIVED FROM iOS - to send over lora 
         // data.sensorId = 1;
