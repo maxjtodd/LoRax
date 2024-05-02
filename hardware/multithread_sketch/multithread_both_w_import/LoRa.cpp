@@ -119,10 +119,13 @@ void SendReceivecode(void* vpParameters) {
       state=STATE_TX; // new message received from bluetooth
     }
 
+    // CHECK FOR ANY MESSAGES THAT HAVE NOT BE ACK'd  
 
-    // else if - 
+
+    // if - 
     // we have a message that has not been ack'ed
-    // if so, we send one more time, then swith to RECEIVE to listen for ACK
+    // we send one more time, then swith to RECEIVE to listen for ACK
+    // PROBLEM - do we send for every message, then listen?
 
     
   /*                             */
@@ -246,14 +249,15 @@ void handleIncomingMessage(messageData newMessage) {
     case 0:
     {
 
-      // Send contact device MAC ADDR to iOS app, determine if seen before
+      // New pping received
       Serial.println("Type is Contant Ping - check if previous contact");
 
-      // traverse linked list
+      // Determine if ping has been received from this contact before. 
       if (knownContacts->contains(newMessage.message_id)) {
         Serial.println("Contact has been previously recorded");
       }
 
+      // if not seen before, add to seen and push to iOS as new contact. 
       else {
         Serial.println("New Contact. Pushing to BT.");
         // insert into linked list
@@ -296,6 +300,7 @@ void handleIncomingMessage(messageData newMessage) {
       // find sent messages corresponding to ACK
       if (sentMessageIDs->contains(newMessage.message_id)) {
         
+        // remove from linked list - do not send any more repeats
         sentMessageIDs->remove(newMessage.message_id);
       }
 
@@ -319,7 +324,7 @@ void sendContactPing() {
   // build send addr
   
   
-  sprintf(txpacket, "0;%s;0;0;0", mac_addr);
+  sprintf(txpacket, "0;%d_%s;0;0;0", pingCount, mac_addr);
 
   // send contact ping
   Radio.Send( (uint8_t *)txpacket, strlen(txpacket) );
@@ -338,7 +343,7 @@ void sendMessageFromiOS() {
 
 
   // packet prinout
-  Serial.printf("\n   PACKET FROM BT (to be sent) : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
+  Serial.printf("\n   PACKET FROM BT (to be sent) : %d;%d_%s;%s;%d;%s\n", data_to_send.message_type, txNumber, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   sprintf(txpacket, "%d;%s;%s;%d;%s", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   Serial.printf(txpacket);
 
@@ -352,6 +357,9 @@ void sendMessageFromiOS() {
       // add packet identifier to sent messages
       Serial.println("Inserting into sent messages");
       sentMessageIDs->insert(data_to_send.message_id);
+
+      // increment txnumb
+      txNumber++;
   } else {
       Serial.println("Error: txpacket is null.");
   }
