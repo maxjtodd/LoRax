@@ -12,9 +12,9 @@
 static RadioEvents_t RadioEvents;
 
 #define RF_FREQUENCY                                915000000 // Hz
-#define TX_OUTPUT_POWER                             14        // dBm
-#define LORA_BANDWIDTH                              0         // [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
-#define LORA_SPREADING_FACTOR                       7         // [SF7..SF12]
+#define TX_OUTPUT_POWER                             20        // dBm
+#define LORA_BANDWIDTH                              1         // [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
+#define LORA_SPREADING_FACTOR                       9        // [SF7..SF12]
 #define LORA_CODINGRATE                             1         // [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8]
 #define LORA_PREAMBLE_LENGTH                        8         // Same for Tx and Rx
 #define LORA_SYMBOL_TIMEOUT                         0         // Symbols
@@ -135,7 +135,7 @@ void SendReceivecode(void* vpParameters) {
       // CASE - send contact ping
       case STATE_TX_CONTACT:
       {
-        Serial.println("Building Contact Ping");
+        //Serial.println("Building Contact Ping");
   
         sendContactPing(); // call send contact ping
       
@@ -153,6 +153,7 @@ void SendReceivecode(void* vpParameters) {
  
         sendMessageFromiOS(); // call send message from iOS
 
+        delay(1000);
 
         state = STATE_RX;
         break;
@@ -276,10 +277,11 @@ void handleIncomingMessage(messageData newMessage) {
       Serial.println("Build and send ACK");
 
       // build ack message
-      messageData ack = {2, newMessage.message_id, 0, 0, 0};
+      char* a = "";
+      Serial.printf("   ACK: %d;%s;%s;%d;%d", newMessage.message_type, newMessage.message_id, newMessage.message_dest, newMessage.size, newMessage.value);
 
       // add to queue to be sent
-      pushMessageData(messageDataQueue_toLora, ack);
+      pushMessageData(messageDataQueue_toLora, newMessage);
 
       break;
     }
@@ -336,14 +338,16 @@ void sendMessageFromiOS() {
 
 
   // packet prinout
-  Serial.printf("   PACKET FROM BT (to be sent) : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
+  Serial.printf("\n   PACKET FROM BT (to be sent) : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   sprintf(txpacket, "%d;%s;%s;%d;%s", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   Serial.printf(txpacket);
 
   if (txpacket != nullptr) {
       Radio.Send((uint8_t*)txpacket, strlen(txpacket));
-      Radio.IrqProcess();
-      Serial.println("\nSent. (from BT)");
+      Radio.IrqProcess( );
+      Serial.println("\nSent. (from BT)\n");
+
+      delay(1500);
 
       // add packet identifier to sent messages
       Serial.println("Inserting into sent messages");
@@ -367,7 +371,7 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr ) {
 
     // build messageData object
     messageData newMessage = processMessageString(rxpacket);
-    Serial.printf(" New Message from LoRa:\n    Type:%d\n   ID:%d\n   Content:%d\n", newMessage.message_type, newMessage.message_id, newMessage.value);
+    Serial.printf(" New Message from LoRa:\n    Type:%d\n   ID:%s\n   Content:%s\n", newMessage.message_type, newMessage.message_id, newMessage.value);
 
 
     // Handle message based on type
