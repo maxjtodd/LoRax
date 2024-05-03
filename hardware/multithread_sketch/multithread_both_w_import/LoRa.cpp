@@ -126,6 +126,23 @@ void SendReceivecode(void* vpParameters) {
     // we have a message that has not been ack'ed
     // we send one more time, then swith to RECEIVE to listen for ACK
     // PROBLEM - do we send for every message, then listen?
+    if (sentMessageIDs->head != nullptr) {
+      Serial.println("Printing previously sent messages");
+      Node* current = sentMessageIDs->head;
+      while (current != nullptr) {
+        Serial.printf(" Node: %s\n", current->messageID);
+        sprintf(txpacket, "%d;%s;%s;%d;%s", current->message.message_type, current->message.message_id, current->message.message_dest, current->message.size, current->message.value);
+        Serial.printf ("  Resending : %s", txpacket);
+        // send message
+        Radio.Send( (uint8_t *)txpacket, strlen(txpacket) );
+        Radio.IrqProcess( );
+
+        delay(1000);
+
+        current=current->next;
+      }
+
+    }
 
     
   /*                             */
@@ -261,7 +278,7 @@ void handleIncomingMessage(messageData newMessage) {
       else {
         Serial.println("New Contact. Pushing to BT.");
         // insert into linked list
-        knownContacts->insert(newMessage.message_id);
+        knownContacts->insert(newMessage.message_id, newMessage);
         // insert into queue
         pushMessageData(messageDataQueue_toBT, newMessage);
 
@@ -343,7 +360,7 @@ void sendMessageFromiOS() {
 
 
   // packet prinout
-  Serial.printf("\n   PACKET FROM BT (to be sent) : %d;%d_%s;%s;%d;%s\n", data_to_send.message_type, txNumber, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
+  Serial.printf("\n   PACKET FROM BT (to be sent) : %d;%s;%s;%d;%s\n", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   sprintf(txpacket, "%d;%s;%s;%d;%s", data_to_send.message_type, data_to_send.message_id, data_to_send.message_dest,  data_to_send.size, data_to_send.value);
   Serial.printf(txpacket);
 
@@ -354,9 +371,13 @@ void sendMessageFromiOS() {
 
       delay(1500);
 
-      // add packet identifier to sent messages
-      Serial.println("Inserting into sent messages");
-      sentMessageIDs->insert(data_to_send.message_id);
+      // add packet identifier to sent messages IF NOT ALREADY ADDED
+      if (!sentMessageIDs->contains(data_to_send.message_id)) {
+        Serial.println(" Inserting into sent messages");
+        sentMessageIDs->insert(data_to_send.message_id, data_to_send);
+      }
+      else { Serial.println(" Message of same Ident already sent.");}
+
 
       // increment txnumb
       txNumber++;
