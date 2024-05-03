@@ -32,12 +32,12 @@ void pushMessageData(messageDataQueue& mdq, messageData& dataToInsert) {
 }
 
 // Initialization functions
-Node::Node(char* id) : messageID(id), next(nullptr) {}
+Node::Node(char* id, messageData mess) : messageID(id), message(mess), next(nullptr) {}
 LL::LL() : head(nullptr) {}
 
 // Insert new node into the ack linked list
-void LL::insert(char* id) {
-  Node* newNode = new Node(id);
+void LL::insert(char* id, messageData mess) {
+  Node* newNode = new Node(id, mess);
   newNode->next = head;
   head = newNode;
 }
@@ -78,5 +78,14 @@ bool LL::contains(char* id) {
   }
 
   return false;
+}
 
+// traverse and print LL - testing purposes
+void LL::traverse() const {
+  //Serial.println("Printing previously sent messages");
+  Node* current = head;
+  while (current != nullptr) {
+    //Serial.printf(" Node: %s\n", current->messageID);
+    current=current->next;
+  }
 }

@@ -45,20 +45,24 @@ extern messageDataQueue messageDataQueue_toBT;
 messageData getMessageData(messageDataQueue& mdq);
 void pushMessageData(messageDataQueue& mdq,  messageData& data);
 
+// LINKED LIST
+
 struct Node {
     char* messageID;
+    messageData message;
     Node* next;
 
-    Node(char* id);
+    Node(char* id, messageData mess);
 };
 
 class LL {
-    private: Node* head;
     public: 
+        Node* head;
         LL();
-        void insert(char* id);
+        void insert(char* id, messageData mess);
         void remove (char* id);
         bool contains(char* id);
+        void traverse() const;
 };
 
 #endif
