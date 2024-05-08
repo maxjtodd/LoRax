@@ -18,7 +18,7 @@ struct PersistenceController {
             
             // create messages
             let newMessage = Message(context: viewContext)
-            newMessage.mac = "1:1:1:1"
+            newMessage.mac = "A1:B2:C3:D4:E5:F1"
             newMessage.content = "hello world"
             newMessage.date = Date()
             if (i % 2 == 0) {
@@ -43,9 +43,25 @@ struct PersistenceController {
         for i in 0..<10 {
             // create contact
             let newContact = Contact(context: viewContext)
-            newContact.mac = "1:1:1:\(i)"
+            newContact.mac = "A1:B2:C3:D4:E5:F\(i)"
             newContact.fName = "User\(i)"
             newContact.lName = "US\(i)"
+            newContact.id = UUID()
+        }
+        do {
+            try viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        
+        for i in 0..<3 {
+            // create non contact
+            let newNonContact = NonContact(context: viewContext)
+            newNonContact.id = UUID()
+            newNonContact.mac = "F1:B2:C3:D4:E5:F\(i)"
         }
         do {
             try viewContext.save()

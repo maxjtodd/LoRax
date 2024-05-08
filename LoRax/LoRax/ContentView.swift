@@ -43,12 +43,7 @@ struct ContentView: View {
 
 
 
-struct ChatView: View {
-    
-    var body: some View {
-        Text("Placeholder for available devices")
-    }
-}
+
 
 
 struct AdvancedView: View {
