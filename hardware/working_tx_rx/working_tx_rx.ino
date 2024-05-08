@@ -7,13 +7,14 @@
 #define CHARACTERISTIC_UUID_TX  "0F146B5F-2B7E-46A0-B246-36ED1867F6E7"
 #define CHARACTERISTIC_UUID_RX  "B54E3121-477C-4A86-9FE7-19292CFA415B"
 
-
 BLEServer* pServer = NULL;
 
 BLECharacteristic* txCharacteristic = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 String data;
+
+
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
@@ -39,8 +40,9 @@ class MyClientCallbacks: public BLECharacteristicCallbacks {
 };
 
 void setup() {
-  Serial.begin(115200);
 
+  Serial.begin(115200);
+  
   BLEDevice::init("LoRax");
 
   pServer = BLEDevice::createServer();
@@ -80,11 +82,12 @@ void setup() {
   BLEDevice::startAdvertising();
 
   Serial.println("Waiting for a client connection to notify...");
-
+  
+  
 }
 
 void loop() {
-  data = "Hello, world!";
+  data = "Message from device";
   if (deviceConnected) {
     txCharacteristic->setValue(data);
     txCharacteristic->notify();
