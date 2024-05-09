@@ -4,3 +4,6 @@
 xcuserdata/
 *~.nib
 DerivedData/
+
+# Stop development certificate issues
+LoRax/LoRax.xcodeproj/project.pbxproj
