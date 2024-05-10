@@ -14,21 +14,32 @@ messageData getMessageData(messageDataQueue& mdq) {
     Pop it from queue
     Returnt the retrieved messageData
   */
-  std::lock_guard<std::mutex> lock(mdq.mtx); // lock mutex
+  //std::lock_guard<std::mutex> lock(mdq.mtx); // lock mutex
+
+      // Check if the queue is empty before trying to access elements
+  if (mdq.queue.empty()) {
+      throw std::runtime_error("Attempt to get message from an empty queue");
+  }
 
   messageData data = mdq.queue.front();
 
+
   mdq.queue.pop(); // remove message from queue
+
+  //std::lock_guard<std::mutex> unlock(mdq.mtx); // lock mutex
 
   return data;
 }
 
 void pushMessageData(messageDataQueue& mdq, messageData& dataToInsert) {
 
-  std::lock_guard<std::mutex> lock(mdq.mtx); // lock mutex
+  //std::lock_guard<std::mutex> lock(mdq.mtx); // lock mutex
 
   mdq.queue.push(dataToInsert);
 
+  //std::lock_guard<std::mutex> unlock(mdq.mtx); // lock mutex
+
+  return;
 }
 
 // Initialization functions

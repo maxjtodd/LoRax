@@ -295,6 +295,8 @@ void handleIncomingMessage(messageData newMessage) {
       
       pushMessageData(messageDataQueue_toBT, newMessage);
 
+      delay(1000);
+
       Serial.println("Build and send ACK");
 
       // build ack message
@@ -303,6 +305,8 @@ void handleIncomingMessage(messageData newMessage) {
 
       // add to queue to be sent
       pushMessageData(messageDataQueue_toLora, newMessage);
+
+      delay(1000);
 
       break;
     }
